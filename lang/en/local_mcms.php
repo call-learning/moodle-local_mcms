@@ -35,10 +35,50 @@ $string['enablemcms'] = 'Enable Moodle Mini CMS';
 $string['enablemcms_help'] = 'Moodle Mini CMS allow to pages that are made of blocks. Blocks can be customized at will.';
 
 $string['page:list'] = 'List Pages';
+
+// Filter labels.
 $string['pagefilter:idnumber'] = 'Unique Identifier (URL)';
 $string['pagefilter:rolename'] = 'Role Name';
 $string['pagefilter:orderby'] = 'Order By';
-$string['pagefilter:fullname'] = 'Full Name';
+$string['pagefilter:title'] = 'Full Name';
+$string['pagefilter:shortname'] = 'Short Name';
 $string['pagefilter:usermodified'] = 'User Modified';
 $string['pagefilter:timecreated'] = 'Time created';
 $string['pagefilter:timemodified'] = 'Time modified';
+
+$string['pagefilter:title:asc'] = 'Full Name (Ascending)';
+$string['pagefilter:title:desc'] = 'Full Name (Descending)';
+$string['pagefilter:timemodified:desc'] = 'Time Modified (Descending)';
+$string['pagefilter:timemodified:asc'] = 'Time Modified (Ascending)';
+
+// Column label.
+$string['idnumber'] = 'Unique Identifier (URL)';
+$string['rolename'] = 'Role Name';
+$string['pagefilter:orderby'] = 'Order By';
+$string['title'] = 'Full Name';
+$string['shortname'] = 'Short Name';
+$string['usermodified'] = 'User Modified';
+$string['timecreated'] = 'Time created';
+$string['timemodified'] = 'Time modified';
+$string['actions'] = 'Actions';
+
+// Add/Edit form.
+$string['page:add'] = 'Add page';
+$string['page:edit'] = 'Edit page';
+$string['page:delete'] = 'Delete page';
+$string['page:list'] = 'All pages';
+
+$string['pagetitle'] = 'Page title';
+$string['pageshortname'] = 'Page Shortname';
+$string['pageidnumber'] = 'Page ID (pretty url)';
+$string['pageroles'] = 'Page Roles';
+
+// Events.
+$string['pageadded'] = 'Page Added';
+$string['pagemodified'] = 'Page Modified';
+$string['pagedeleted'] = 'Page Deleted';
+
+// Actions.
+$string['pageaction:view'] = 'View page';
+$string['pageaction:edit'] = 'Edit page';
+$string['pageaction:delete'] = 'Delete page';

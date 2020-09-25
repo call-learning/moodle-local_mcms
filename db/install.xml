@@ -7,7 +7,7 @@
     <TABLE NAME="local_mcms_page" COMMENT="A page basic definition">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="fullname" TYPE="char" LENGTH="254" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="title" TYPE="char" LENGTH="254" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="shortname" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="idnumber" TYPE="char" LENGTH="1024" NOTNULL="false" SEQUENCE="false" COMMENT="The unique identifier for this page. This will also be the &quot;nice&quot; url."/>
         <FIELD NAME="usermodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>

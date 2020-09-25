@@ -43,7 +43,7 @@ use table_sql;
  */
 class page_list extends table_sql {
 
-    /** @var array list of user fullnames shown in report */
+    /** @var array list of user fullname shown in report */
     private $userfullnames = array();
 
     /** @var stdClass filters parameters */
@@ -65,7 +65,7 @@ class page_list extends table_sql {
         // Add course column if logs are displayed for site.
         $cols = array();
         $headers = array();
-        $this->define_columns(array_merge($cols, array('fullname',
+        $this->define_columns(array_merge($cols, array('title',
             'shortname',
             'idnumber',
             'usermodified',
@@ -73,13 +73,13 @@ class page_list extends table_sql {
             'timemodified',
             'actions')));
         $this->define_headers(array_merge($headers, array(
-                get_string('fullname'),
-                get_string('shortname'),
-                get_string('idnumber'),
-                get_string('usermodified'),
-                get_string('timecreated'),
-                get_string('timemodified'),
-                get_string('actions')
+                get_string('title', 'local_mcms'),
+                get_string('shortname', 'local_mcms'),
+                get_string('idnumber', 'local_mcms'),
+                get_string('usermodified', 'local_mcms'),
+                get_string('timecreated', 'local_mcms'),
+                get_string('timemodified', 'local_mcms'),
+                get_string('actions', 'local_mcms')
             )
         ));
         $this->collapsible(false);
@@ -91,7 +91,7 @@ class page_list extends table_sql {
      * Gets the user full name
      *
      * This function is useful because, in the unlikely case that the user is
-     * not already loaded in $this->userfullnames it will fetch it from db.
+     * not already loaded in $this->userfullname it will fetch it from db.
      *
      * @param int $userid
      * @return false|\lang_string|mixed|string
@@ -110,14 +110,15 @@ class page_list extends table_sql {
         }
 
         // We already looked for the user and it does not exist.
-        if ($this->userfullnames[$userid] === false) {
+        if (isset($this->userfullnames[$userid]) && $this->userfullnames[$userid] === false) {
             return false;
         }
 
         // If we reach that point new users logs have been generated since the last users db query.
         list($usql, $uparams) = $DB->get_in_or_equal($userid);
         $sql = "SELECT id," . get_all_user_name_fields(true) . " FROM {user} WHERE id " . $usql;
-        if (!$user = $DB->get_records_sql($sql, $uparams)) {
+        if (!$user = $DB->get_record_sql($sql, $uparams)) {
+            $this->userfullnames[$userid] = false;
             return false;
         }
 
@@ -166,13 +167,13 @@ class page_list extends table_sql {
     }
 
     /**
-     * Generate the fullname column.
+     * Generate the title column.
      *
      * @param stdClass $page page data
      * @return string HTML for the description column
      */
-    public function col_fullname($page) {
-        return $page->fullname;
+    public function col_title($page) {
+        return $page->title;
     }
 
     /**
@@ -208,22 +209,21 @@ class page_list extends table_sql {
 
         $actions = [];
 
-        $baseurl = '/local/mcms/admin/';
+        $baseurl = '/local/mcms/admin/page';
 
         $actionsdef = [
-            'add' => (object) [
-                'icon' => 't/add',
-                'url' => new moodle_url($baseurl . '/add.php'),
+            'edit' => (object) [
+                'icon' => 't/edit',
+                'url' => new moodle_url($baseurl . '/edit.php', ['id' => $row->id]),
             ],
             'view' => (object) [
                 'icon' => 'e/search',
-                'url' => new moodle_url($baseurl . '/view.php', ['pageid' => $row->id]),
+                'url' => new moodle_url('/local/mcms/index.php', ['id' => $row->id]),
                 'popup' => true
             ],
             'delete' => (object) [
                 'icon' => 't/delete',
-                'url' => new moodle_url($baseurl . '/delete.php'),
-                'popup' => true
+                'url' => new moodle_url($baseurl . '/delete.php', ['id' => $row->id])
             ]
         ];
         foreach ($actionsdef as $k => $a) {
@@ -255,14 +255,7 @@ class page_list extends table_sql {
     }
 
     /**
-     * Query the reader. Store results in the object for use by build_table.
-     *
-     *
-     *     - string fullname:  fullname
-     *     - string shortname:  shortname
-     *     - string idnumber:  idnumber
-     *     - int roleid: role id to filter
-     *     - int userid: user id
+     * Query the database. Store results in the object for use by build_table.
      *
      * @param int $pagesize size of page for paginated displayed table.
      * @param bool $useinitialsbar do you want to use the initials bar.
@@ -271,12 +264,12 @@ class page_list extends table_sql {
     public function query_db($pagesize, $useinitialsbar = true) {
         global $DB;
 
-        $joins = array();
+        $joins = array('1=1');
         $params = array();
 
-        $orderby = 'fullname ASC';
+        $orderby = 'title ASC';
         if ($this->filterparams) {
-            $this->build_search_filter_like('fullname', $joins, $params);
+            $this->build_search_filter_like('title', $joins, $params);
             $this->build_search_filter_like('shortname', $joins, $params);
             $this->build_search_filter_like('idnumber', $joins, $params);
             $orderby = !empty($this->filterparams->orderby) ? $this->filterparams->orderby : $orderby;
@@ -284,15 +277,20 @@ class page_list extends table_sql {
         $selector = implode(' AND ', $joins);
 
         if (!$this->is_downloading()) {
-            $total = $DB->count_records_select('local_mcms', $selector, $params);
+            $total = $DB->count_records_select('local_mcms_page', $selector, $params);
             $this->pagesize($pagesize, $total);
         } else {
             $this->pageable(false);
         }
 
-        // Get the users and course data.
-        $this->rawdata = $DB->get_recordset_select('local_mcms', $selector, $params,
-            $orderby, $this->get_page_start(), $this->get_page_size());
+        // Get all matching data.
+        $this->rawdata = $DB->get_recordset_select('local_mcms_page',
+            $selector,
+            $params,
+            $orderby,
+            '*',
+            $this->get_page_start(),
+            $this->get_page_size());
 
         // Set initial bars.
         if ($useinitialsbar && !$this->is_downloading()) {
@@ -304,15 +302,23 @@ class page_list extends table_sql {
      * Return filter defintion
      *
      * @return array
+     * @throws \coding_exception
      */
     public static function get_filter_definition() {
         return array(
             'shortname' => (object) ['type' => PARAM_TEXT, 'default' => ''],
-            'fullname' => (object) ['type' => PARAM_TEXT, 'default' => ''],
+            'title' => (object) ['type' => PARAM_TEXT, 'default' => ''],
             'idnumber' => (object) ['type' => PARAM_TEXT, 'default' => ''],
             'rolename' => (object) ['type' => PARAM_TEXT, 'default' => ''],
             'usermodified' => (object) ['type' => PARAM_TEXT, 'default' => ''],
-            'orderby' => (object) ['type' => PARAM_TEXT, 'default' => 'fullname ASC'],
+            'orderby' => (object) ['type' => PARAM_TEXT,
+                'choices' => [
+                    'title ASC' => get_string('pagefilter:title:asc', 'local_mcms'),
+                    'title DESC' => get_string('pagefilter:title:desc', 'local_mcms'),
+                    'timemodified ASC' => get_string('pagefilter:timemodified:asc', 'local_mcms'),
+                    'timemodified DESC' => get_string('pagefilter:timemodified:desc', 'local_mcms')
+                ],
+                'default' => 'title ASC'],
         );
     }
 }

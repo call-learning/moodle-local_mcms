@@ -48,9 +48,13 @@ class page_list_filter_form extends \moodleform {
             $default = empty($this->_customdata[$filtername]) ? $filterdef->default : $this->_customdata[$filtername];
             switch ($filterdef->type) {
                 default:
-                    $mform->addElement('text', $filtername, get_string('pagefilter:' . $filtername, 'local_mcms'), $default);
-                    $mform->setType($filtername, $filterdef->type);
-
+                    if (!empty($filterdef->choices)) {
+                        $mform->addElement('select', $filtername, get_string('pagefilter:' . $filtername, 'local_mcms'), $filterdef->choices);
+                        $mform->setType($filtername, $filterdef->type);
+                    } else {
+                        $mform->addElement('text', $filtername, get_string('pagefilter:' . $filtername, 'local_mcms'), $default);
+                        $mform->setType($filtername, $filterdef->type);
+                    }
             }
         }
         // Add parent page (for structure & menu).

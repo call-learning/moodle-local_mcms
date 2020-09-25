@@ -25,20 +25,17 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-
 use local_mcms\event\page_added;
 use local_mcms\page;
-use local_mcms\page_exception;
 
 require_once(__DIR__ . '/../../../../config.php');
 
 global $CFG;
 require_once($CFG->libdir . '/adminlib.php');
 require_once('add_edit_form.php');
-
-admin_externalpage_setup('managepage');
 require_login();
-require_capability('local/mcms:managepages');
+require_capability('local/mcms:managepages', context_system::instance());
+admin_externalpage_setup('managepage');
 
 // Override pagetype to show blocks properly.
 $header = get_string('page:add', 'local_mcms');
@@ -51,10 +48,9 @@ $listpageurl = new moodle_url($CFG->wwwroot . '/local/mcms/admin/page/list.php')
 $PAGE->navbar->add(get_string('page:list', 'local_mcms'), new moodle_url($listpageurl));
 $PAGE->navbar->add($header, null);
 
-$mform = new add_edit_form();
+$mform = new add_edit_form(null, ['persistent' => null]);
 $mform->set_data(array());
 
-$listurl = new moodle_url($CFG->wwwroot . '/local/mcms/admin/page/list.php');
 if ($mform->is_cancelled()) {
     redirect($listurl);
 } else if ($data = $mform->get_data()) {
@@ -64,14 +60,19 @@ if ($mform->is_cancelled()) {
         unset($pagedata->pageroles);
         $page = new page(0, $pagedata);
         $page->create();
-        $eventparams = array('objectid' => $page->id, 'context' => context_system::instance());
+        $eventparams = array('objectid' => $page->get('id'), 'context' => context_system::instance());
         $event = page_added::create($eventparams);
         $event->trigger();
-        $OUTPUT->notification(get_string('pageadded', 'local_mcms'), 'notifysuccess');
-    } catch (page_exception $e) {
+
+        $viewurl = new moodle_url($CFG->wwwroot . '/local/mcms/index.php', ['id'=> $page->get('id')]);
+        /* @var core_renderer $OUTPUT */
+        redirect($viewurl,
+            get_string('pageadded', 'local_mcms'),
+            3,
+            $messagetype = \core\output\notification::NOTIFY_SUCCESS);
+    } catch (moodle_exception $e) {
         $OUTPUT->notification($e->getMessage(), 'notifyfailure');
     }
-    redirect($listurl);
 }
 
 echo $OUTPUT->header();

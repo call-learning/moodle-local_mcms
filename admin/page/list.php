@@ -29,9 +29,9 @@ require_once(__DIR__ . '/../../../../config.php');
 
 global $CFG, $PAGE, $OUTPUT;
 require_once($CFG->libdir . '/adminlib.php');
-
-admin_externalpage_setup('managepage');
 require_login();
+require_capability('local/mcms:managepages', context_system::instance());
+admin_externalpage_setup('managepage');
 
 // Get filter parameters.
 $filtervalues = [];
@@ -50,7 +50,8 @@ $pageurl =
     new moodle_url($CFG->wwwroot . '/local/mcms/admin/page/list.php', $filtervalues + ['page' => $page, 'perpage' => $perpage]);
 
 $PAGE->set_url($pageurl);
-
+$buttonadd = new single_button(new moodle_url($CFG->wwwroot . '/local/mcms/admin/page/add.php'), get_string('add'));
+$PAGE->set_button($OUTPUT->render($buttonadd));
 $mform = new local_mcms\page_list_filter_form(null, $filtervalues);
 $mform->set_data($filtervalues);
 
@@ -63,5 +64,7 @@ $pagelist = new local_mcms\page_list_renderable();
 $renderer = $PAGE->get_renderer('local_mcms');
 echo $OUTPUT->header();
 echo $OUTPUT->heading(get_string('page:list', 'local_mcms'), 3);
+
+echo $mform->render();
 echo $renderer->render($pagelist);
 echo $OUTPUT->footer();

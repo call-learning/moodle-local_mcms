@@ -35,9 +35,10 @@ require_once(__DIR__ . '/../../../../config.php');
 global $CFG;
 require_once($CFG->libdir . '/adminlib.php');
 require_once($CFG->libdir . '/weblib.php');
-
-admin_externalpage_setup('managepage');
 require_login();
+require_capability('local/mcms:managepages', context_system::instance());
+admin_externalpage_setup('managepage');
+
 $id = required_param('id', PARAM_INT);
 $confirm = optional_param('confirm', false, PARAM_BOOL);
 
@@ -61,6 +62,7 @@ if (!$confirm) {
 } else {
     require_sesskey();
     $page = new page($id);
+    $page->delete_associated_roles();
     $page->delete();
     echo $OUTPUT->notification(get_string('pagedeleted', 'local_mcms'), 'notifysuccess');
     echo $OUTPUT->single_button($listpageurl, get_string('continue'));

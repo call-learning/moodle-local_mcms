@@ -61,12 +61,12 @@ class page_list_renderable implements renderable {
     /**
      * @var \stdClass filter
      *
-     *  string fullname:  fullname
+     *  string title:  title
      *  string shortname:  shortname
      *  string idnumber:  idnumber
      *  int roleid: role id to filter
      *  int userid: user id
-     *  string orderby : 'asc fullname'
+     *  string orderby : 'asc title'
      */
     public $filter;
 

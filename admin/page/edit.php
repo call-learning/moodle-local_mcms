@@ -25,19 +25,19 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-
 use local_mcms\event\page_updated;
 use local_mcms\page;
-use local_mcms\page_exception;
+use local_mcms\page_role;
 
 require_once(__DIR__ . '/../../../../config.php');
 
 global $CFG;
 require_once($CFG->libdir . '/adminlib.php');
 require_once('add_edit_form.php');
-
-admin_externalpage_setup('managepage');
 require_login();
+require_capability('local/mcms:managepages', context_system::instance());
+admin_externalpage_setup('managepage');
+
 $id = required_param('id', PARAM_INT);
 
 // Override pagetype to show blocks properly.
@@ -53,7 +53,14 @@ $PAGE->navbar->add($header, null);
 
 $page = new page($id);
 
-$pagedata = (array) $page;
+$pagedata = (array) $page->to_record();
+$pagedata['persistent'] = 0;
+
+// Get associated roles.
+$pagedata['pageroles'] = array_map(function($r) {
+    return $r->id;
+}, $page->get_associated_roles());
+
 $mform = new add_edit_form(null, $pagedata);
 $mform->set_data($pagedata);
 
@@ -68,10 +75,13 @@ if ($data = $mform->get_data()) {
     unset($pagedata->pageroles);
     $page = new page($pagedata->id, $pagedata);
     $page->update();
+    $page->update_associated_roles($data->pageroles);
     $action = get_string('pageinfoupdated', 'local_mcms');
-    $eventparams = array('objectid' => $page->id, 'context' => context_system::instance(), 'other' => array(
-        'actions' => $action
-    ));
+    $eventparams = array('objectid' => $page->get('id'),
+        'context' => context_system::instance(),
+        'other' => array(
+            'actions' => $action
+        ));
     $event = page_updated::create($eventparams);
     $event->trigger();
     echo $OUTPUT->notification($action, 'notifysuccess');

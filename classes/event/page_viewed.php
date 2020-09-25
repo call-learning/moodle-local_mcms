@@ -25,56 +25,58 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_mcms;
+namespace local_mcms\event;
+
+use core\event\base;
 
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Class page
+ * Class page_updated, when a page is updated.
  *
  * @package   local_mcms
  * @copyright 2020 - CALL Learning - Laurent David <laurent@call-learning>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class page extends \core\persistent {
-    const TABLE = 'local_mcms_page';
-
-    protected $roles;
-
-    protected static function define_properties() {
-        return array(
-            'title' => array(
-                'type' => PARAM_TEXT,
-                'default' => ''
-            ),
-            'shortname' => array(
-                'type' => PARAM_TEXT,
-                'default' => ''
-            ),
-            'idnumber' => array(
-                'type' => PARAM_ALPHANUMEXT,
-                'default' => ''
-            )
-        );
+class page_viewed extends base {
+    /**
+     * Init method.
+     *
+     * @return void
+     */
+    protected function init() {
+        $this->data['crud'] = 'u';
+        $this->data['edulevel'] = self::LEVEL_OTHER;
+        $this->data['objecttable'] = 'local_mcms_page';
     }
 
-    public function get_associated_roles() {
-        $roles = page_role::get_records(['pageid' => $this->get('id')]);
-        return $roles;
+    /**
+     * Returns localised event name.
+     *
+     * @return string
+     * @throws \coding_exception
+     */
+    public static function get_name() {
+        return get_string('pageviewed', 'local_mcms');
     }
 
-    public function update_associated_roles($rolesid) {
-        $this->delete_associated_roles();
-        foreach ($rolesid as $rid) {
-            $role = new page_role(0, (object) ['pageid' => $this->get('id'), 'roleid' => $rid]);
-            $role->create();
-        }
+    /**
+     * Returns non-localised event description with id's for admin use only.
+     *
+     * @return string
+     */
+    public function get_description() {
+        $action = s(!empty($this->other['actions']) ? $this->other['actions'] : '');
+        return "Page with id '$this->objectid' has been viewed.";
     }
-    public function delete_associated_roles() {
-        $roles = page_role::get_records(['pageid' => $this->get('id')]);
-        foreach ($roles as $r) {
-            $r->delete();
-        }
+
+    /**
+     * Get the backup/restore table mapping for this event.
+     *
+     * @return array
+     */
+    public static function get_objectid_mapping() {
+        return array('db' => 'local_mcms_page', 'restore' => 'local_mcms_page');
     }
 
 }

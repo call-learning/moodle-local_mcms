@@ -34,52 +34,55 @@ global $CFG;
  */
 class add_edit_form extends core\form\persistent {
 
+    /** @var string The fully qualified classname. */
+    protected static $persistentclass = '\\local_mcms\\page';
+
+    /** @var array Fields to remove when getting the final data. */
+    protected static $fieldstoremove = array('submitbutton');
+
+    protected static $foreignfields = array('pageroles');
     /**
      * The form definition.
      */
     public function definition() {
+        global $DB;
+
         $mform = $this->_form;
 
-        $fullname = empty($this->_customdata['fullname']) ? '' : $this->_customdata['fullname'];
+        $title = empty($this->_customdata['title']) ? '' : $this->_customdata['title'];
         $shortname = empty($this->_customdata['shortname']) ? '' : $this->_customdata['shortname'];
         $idnumber = empty($this->_customdata['idnumber']) ? '' : $this->_customdata['idnumber'];
+        $pageroles = empty($this->_customdata['pageroles']) ? '' : $this->_customdata['pageroles'];
         $id = empty($this->_customdata['id']) ? '' : $this->_customdata['id'];
         if ($id) {
             $mform->addElement('hidden', 'id', $id);
             $mform->setType('id', PARAM_INT);
         }
 
-        $mform->addElement('text', 'fullname', get_string('pagename', 'local_mcms'), $fullname);
-        $mform->setType('fullname', PARAM_TEXT);
-        $mform->addRule('fullname', get_string('required'), 'required');
+        $mform->addElement('text', 'title', get_string('pagetitle', 'local_mcms'), $title);
+        $mform->setType('title', PARAM_TEXT);
+        $mform->addRule('title', get_string('required'), 'required');
 
         $mform->addElement('text', 'shortname', get_string('pageshortname', 'local_mcms'), $shortname);
         $mform->setType('shortname', PARAM_TEXT);
         $mform->addRule('shortname', get_string('required'), 'required');
 
-        $mform->addElement('text', 'idnumber', get_string('pageshortname', 'local_mcms'), $idnumber);
+        $mform->addElement('text', 'idnumber', get_string('pageidnumber', 'local_mcms'), $idnumber);
         $mform->setType('idnumber', PARAM_ALPHANUMEXT);
 
-        $roles = get_roles_for_contextlevels(context_system::instance()->id);
+        $options = $DB->get_records('role');
+        $roles = [];
+        foreach ($options as $p) {
+            $roles[$p->id] = role_get_name($p);
+        }
         $mform->addElement('searchableselector',
             'pageroles',
             get_string('pageroles', 'local_mcms'),
             $roles,
             array('multiple' => true));
 
+        $mform->setDefault('pageroles', $pageroles);
         // Add parent page (for structure & menu).
         $this->add_action_buttons(true, get_string('save'));
-    }
-
-    /**
-     * Validates the data submit for this form.
-     *
-     * @param array $data An array of key,value data pairs.
-     * @param array $files Any files that may have been submit as well.
-     * @return array An array of errors.
-     */
-    public function validation($data, $files) {
-        $errors = parent::validation($data, $files);
-        return $errors;
     }
 }
