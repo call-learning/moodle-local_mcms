@@ -54,12 +54,7 @@ $buttonadd = new single_button(new moodle_url($CFG->wwwroot . '/local/mcms/admin
 $PAGE->set_button($OUTPUT->render($buttonadd));
 $mform = new local_mcms\page_list_filter_form(null, $filtervalues);
 $mform->set_data($filtervalues);
-
-$filterdata = null;
-if ($mform->get_data()) {
-    $filterdata = $mform->get_data($pageurl, $page, $perpage, $filterdata);
-}
-$pagelist = new local_mcms\page_list_renderable();
+$pagelist = new local_mcms\page_list_renderable($mform->get_data());
 
 $renderer = $PAGE->get_renderer('local_mcms');
 echo $OUTPUT->header();

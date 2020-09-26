@@ -57,7 +57,6 @@ class page_list_renderable implements renderable {
     /** @var page_list page list */
     public $pagelist;
 
-
     /**
      * @var \stdClass filter
      *
@@ -80,10 +79,10 @@ class page_list_renderable implements renderable {
      * @throws \dml_exception
      */
     public function __construct(
+        $filter = null,
         $url = "",
         $page = 0,
-        $perpage = 100,
-        $filter = null
+        $perpage = 100
     ) {
 
         global $PAGE;
@@ -98,7 +97,7 @@ class page_list_renderable implements renderable {
         $this->page = $page;
         $this->perpage = $perpage;
         $this->url = $url;
-        $this->filter = $filter;
+        $this->filter = $filter ? $filter : null;
         $this->setup_table();
     }
 

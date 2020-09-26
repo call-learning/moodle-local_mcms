@@ -58,6 +58,10 @@ class page_list_filter_form extends \moodleform {
             }
         }
         // Add parent page (for structure & menu).
-        $this->add_action_buttons(true, get_string('search'));
+        $buttonarray[] = &$mform->createElement('submit', 'search',
+            get_string('search'));
+        $buttonarray[] = $mform->createElement('reset', 'clear', get_string('clear'));
+        $mform->addGroup($buttonarray, 'buttonar', '', array(' '), false);
+        $mform->closeHeaderBefore('buttonar');
     }
 }

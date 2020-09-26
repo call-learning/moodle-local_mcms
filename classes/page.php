@@ -39,8 +39,11 @@ defined('MOODLE_INTERNAL') || die();
 class page extends \core\persistent {
     const TABLE = 'local_mcms_page';
 
-    protected $roles;
-
+    /**
+     * Usual properties definition for a persistent
+     *
+     * @return array|array[]
+     */
     protected static function define_properties() {
         return array(
             'title' => array(
@@ -58,11 +61,33 @@ class page extends \core\persistent {
         );
     }
 
-    public function get_associated_roles() {
-        $roles = page_role::get_records(['pageid' => $this->get('id')]);
+    /**
+     * Get the page associated roles
+     * This is the static version and avoid building a page object to get this information.
+     * @param $pageid
+     * @return page_role[]
+     */
+    public static function get_page_roles($pageid) {
+        $roles = page_role::get_records(['pageid' => $pageid]);
         return $roles;
     }
 
+    /**
+     * Get current page associated roles
+     *
+     * @return page_role[]
+     * @throws \coding_exception
+     */
+    public function get_associated_roles() {
+        return static::get_page_roles($this->get('id'));
+    }
+
+    /**
+     * Update associated role
+     * @param $rolesid
+     * @throws \coding_exception
+     * @throws \core\invalid_persistent_exception
+     */
     public function update_associated_roles($rolesid) {
         $this->delete_associated_roles();
         foreach ($rolesid as $rid) {

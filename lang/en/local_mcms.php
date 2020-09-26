@@ -54,6 +54,7 @@ $string['pagefilter:timemodified:asc'] = 'Time Modified (Ascending)';
 // Column label.
 $string['idnumber'] = 'Unique Identifier (URL)';
 $string['rolename'] = 'Role Name';
+$string['roles'] = 'Roles';
 $string['pagefilter:orderby'] = 'Order By';
 $string['title'] = 'Full Name';
 $string['shortname'] = 'Short Name';
@@ -77,6 +78,7 @@ $string['pageroles'] = 'Page Roles';
 $string['pageadded'] = 'Page Added';
 $string['pagemodified'] = 'Page Modified';
 $string['pagedeleted'] = 'Page Deleted';
+$string['pageinfoupdated'] = 'Page Info Updated';
 
 // Actions.
 $string['pageaction:view'] = 'View page';

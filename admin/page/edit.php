@@ -58,7 +58,7 @@ $pagedata['persistent'] = 0;
 
 // Get associated roles.
 $pagedata['pageroles'] = array_map(function($r) {
-    return $r->id;
+    return $r->get('id');
 }, $page->get_associated_roles());
 
 $mform = new add_edit_form(null, $pagedata);

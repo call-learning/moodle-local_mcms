@@ -21,6 +21,9 @@
  * @copyright   2019 CALL Learning <laurent@call-learning.fr>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+use local_mcms\page_role;
+
 defined('MOODLE_INTERNAL') || die();
 require_once($CFG->libdir . '/formslib.php');
 global $CFG;
@@ -41,6 +44,7 @@ class add_edit_form extends core\form\persistent {
     protected static $fieldstoremove = array('submitbutton');
 
     protected static $foreignfields = array('pageroles');
+
     /**
      * The form definition.
      */
@@ -70,11 +74,7 @@ class add_edit_form extends core\form\persistent {
         $mform->addElement('text', 'idnumber', get_string('pageidnumber', 'local_mcms'), $idnumber);
         $mform->setType('idnumber', PARAM_ALPHANUMEXT);
 
-        $options = $DB->get_records('role');
-        $roles = [];
-        foreach ($options as $p) {
-            $roles[$p->id] = role_get_name($p);
-        }
+        $roles = page_role::get_all_roles_names();
         $mform->addElement('searchableselector',
             'pageroles',
             get_string('pageroles', 'local_mcms'),

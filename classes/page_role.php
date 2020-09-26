@@ -39,6 +39,11 @@ defined('MOODLE_INTERNAL') || die();
 class page_role extends \core\persistent {
     const TABLE = 'local_mcms_page_roles';
 
+    /**
+     * Usual properties definition for a persistent
+     *
+     * @return array|array[]
+     */
     protected static function define_properties() {
         return array(
             'pageid' => array(
@@ -50,5 +55,22 @@ class page_role extends \core\persistent {
                 'default' => ''
             ),
         );
+    }
+
+    /**
+     * Get all roles names
+     *
+     * @return array associative array of roles
+     * @throws \coding_exception
+     * @throws \dml_exception
+     */
+    public static function get_all_roles_names() {
+        global $DB;
+        $options = $DB->get_records('role');
+        $roles = [];
+        foreach ($options as $p) {
+            $roles[$p->id] = role_get_name($p);
+        }
+        return $roles;
     }
 }

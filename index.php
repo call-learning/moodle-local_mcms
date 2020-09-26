@@ -56,6 +56,11 @@ if ($PAGE->user_allowed_editing()) {
     if ($edit !== null) {             // Editing state was specified.
         $USER->editing = $edit;       // Change editing state.
     }
+    if (!empty($USER->editing)) {
+        $edit = 1;
+    } else {
+        $edit = 0;
+    }
     // Add button for editing page.
     $params['edit'] = !$edit;
     $url = new moodle_url("$CFG->wwwroot/local/mcms/index.php", $params);

@@ -67,6 +67,7 @@ class page_list extends table_sql {
         $headers = array();
         $this->define_columns(array_merge($cols, array('title',
             'shortname',
+            'roles',
             'idnumber',
             'usermodified',
             'timecreated',
@@ -75,6 +76,7 @@ class page_list extends table_sql {
         $this->define_headers(array_merge($headers, array(
                 get_string('title', 'local_mcms'),
                 get_string('shortname', 'local_mcms'),
+                get_string('roles', 'local_mcms'),
                 get_string('idnumber', 'local_mcms'),
                 get_string('usermodified', 'local_mcms'),
                 get_string('timecreated', 'local_mcms'),
@@ -143,6 +145,24 @@ class page_list extends table_sql {
      */
     public function col_timecreated($page) {
         return $this->get_time($page->timecreated);
+    }
+
+    /**
+     * Generate the role column.
+     *
+     * @param stdClass $page page data
+     * @return string HTML for the time column
+     */
+    public function col_roles($page) {
+        global $DB;
+        $roleshtml = '';
+
+        $associatedroles = page::get_page_roles($page->id);
+        foreach ($associatedroles as $r) {
+            $role = $DB->get_record('role', array('id' => $r->get('roleid')));
+            $roleshtml .= \html_writer::div(role_get_name($role), 'badge badge-primary');
+        }
+        return $roleshtml;
     }
 
     /**
@@ -218,8 +238,7 @@ class page_list extends table_sql {
             ],
             'view' => (object) [
                 'icon' => 'e/search',
-                'url' => new moodle_url('/local/mcms/index.php', ['id' => $row->id]),
-                'popup' => true
+                'url' => new moodle_url('/local/mcms/index.php', ['id' => $row->id])
             ],
             'delete' => (object) [
                 'icon' => 't/delete',
@@ -246,7 +265,7 @@ class page_list extends table_sql {
      * @param array $joins
      * @param array $params
      */
-    protected function build_search_filter_like($fieldname, $joins, $params) {
+    protected function build_search_filter_like($fieldname, &$joins, &$params) {
         if (!empty($this->filterparams->$fieldname)) {
             global $DB;
             $joins[] = $DB->sql_like($fieldname, ':' . $fieldname, false, false);
