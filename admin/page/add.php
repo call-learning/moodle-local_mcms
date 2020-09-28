@@ -49,32 +49,38 @@ $PAGE->navbar->add(get_string('page:list', 'local_mcms'), new moodle_url($listpa
 $PAGE->navbar->add($header, null);
 
 $mform = new add_edit_form(null, ['persistent' => null]);
-$mform->set_data(array());
 
+$errornotification = '';
 if ($mform->is_cancelled()) {
-    redirect($listurl);
+    redirect($listpageurl);
 } else if ($data = $mform->get_data()) {
     // Add a new page.
     try {
-        $pagedata = clone $data;
-        unset($pagedata->pageroles);
-        $page = new page(0, $pagedata);
+        $page = new page(0, $data);
         $page->create();
+        $page->update_associated_roles($data->pageroles);
+        $data = file_postupdate_standard_filemanager($data, 'image',
+            $mform->get_images_options(),
+            context_system::instance(),
+            \local_mcms\page_utils::PLUGIN_FILE_COMPONENT,
+            \local_mcms\page_utils::PLUGIN_FILE_AREA_IMAGE, $page->get('id'));
+
         $eventparams = array('objectid' => $page->get('id'), 'context' => context_system::instance());
         $event = page_added::create($eventparams);
         $event->trigger();
 
-        $viewurl = new moodle_url($CFG->wwwroot . '/local/mcms/index.php', ['id'=> $page->get('id')]);
+        $viewurl = new moodle_url($CFG->wwwroot . '/local/mcms/index.php', ['id' => $page->get('id')]);
         /* @var core_renderer $OUTPUT */
         redirect($viewurl,
             get_string('pageadded', 'local_mcms'),
-            3,
+            null,
             $messagetype = \core\output\notification::NOTIFY_SUCCESS);
     } catch (moodle_exception $e) {
-        $OUTPUT->notification($e->getMessage(), 'notifyfailure');
+        $errornotification = $OUTPUT->notification($e->getMessage(), 'notifyfailure');
     }
 }
 
 echo $OUTPUT->header();
+echo $errornotification;
 $mform->display();
 echo $OUTPUT->footer();

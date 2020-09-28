@@ -28,15 +28,40 @@
 use local_mcms\page;
 
 require_once(__DIR__ . '/../../config.php');
-$pageid = required_param('id', PARAM_INT);
+global $SITE, $PAGE, $USER;
+
+$pageid = optional_param('id', null, PARAM_INT);
+$pageidnumber = optional_param('p', null, PARAM_ALPHANUMEXT);
 $edit = optional_param('edit', null, PARAM_BOOL);    // Turn editing on and off
 
-$page = new page($pageid);
+require_login();
+
+$page = null;
+if (!$pageid && !$pageidnumber) {
+    if (!$pageidnumber) {
+        print_error('pageoridnumbermssing', 'local_mcms');
+    }
+    $page = page::get_record_by_idnumber($pageidnumber);
+} else {
+    $page = new page($pageid);
+}
+
 if (!$page) {
     print_error('nomatchingpage', 'local_mcms');
 }
-$pagetitle = $page->get('title');
+
 $context = context_system::instance();
+
+// Check user can view the page.
+$canviewpage = $isadmin = has_capability('moodle/site:config', $context);
+
+foreach ($page->get_associated_roles() as $role) {
+    $canviewpage |= user_has_role_assignment($USER->id, $role->get('roleid'));
+}
+if (!$canviewpage) {
+    print_error('cannotviewpage', 'local_mcms');
+}
+$pagetitle = $page->get('title');
 $header = "$SITE->shortname: $pagetitle";
 $PAGE->set_blocks_editing_capability('local/mcms:editpage');
 
@@ -44,7 +69,11 @@ $PAGE->set_blocks_editing_capability('local/mcms:editpage');
 $params = array('id' => $pageid);
 $PAGE->set_context($context);
 $PAGE->set_url('/local/mcms/index.php', $params);
-$PAGE->set_pagelayout('standard');
+$layout = "standard";
+if (key_exists(\local_mcms\page_utils::PAGE_LAYOUT_NAME, $PAGE->theme->layouts)) {
+    $layout = \local_mcms\page_utils::PAGE_LAYOUT_NAME;
+}
+$PAGE->set_pagelayout($layout);
 $PAGE->set_pagetype('mcmspage');
 $PAGE->blocks->add_region('content');
 $PAGE->set_title($pagetitle);
@@ -67,7 +96,6 @@ if ($PAGE->user_allowed_editing()) {
     $editactionstring = !$edit ? get_string('turneditingon') : get_string('turneditingoff');
     $editbutton = $OUTPUT->single_button($url, $editactionstring);
 
-
     $url = new moodle_url("$CFG->wwwroot/local/mcms/admin/page/list.php", $params);
     $pagelist = $OUTPUT->single_button($url, get_string('page:list', 'local_mcms'));
 
@@ -76,11 +104,22 @@ if ($PAGE->user_allowed_editing()) {
     $USER->editing = $edit = 0;
 }
 $PAGE->blocks->set_default_region('content');
-echo $OUTPUT->header();
 
-echo $OUTPUT->custom_block_region('content');
+$renderer = $PAGE->get_renderer('local_mcms');
 
-echo $OUTPUT->footer();
+echo $renderer->header();
+
+// The theme does not take care of the layout, so we still display the header.
+if ($layout != \local_mcms\page_utils::PAGE_LAYOUT_NAME) {
+    $pageheaderenderable = new \local_mcms\output\pageheader\pageheader($page);
+    $pageheaderrenderer = $PAGE->get_renderer('local_mcms', 'pageheader');
+
+    echo $pageheaderrenderer->render($pageheaderenderable);
+}
+
+echo $renderer->custom_block_region('content');
+
+echo $renderer->footer();
 
 // Trigger the page has been viewed event.
 $eventparams = array('context' => $context, 'objectid' => $page->get('id'));

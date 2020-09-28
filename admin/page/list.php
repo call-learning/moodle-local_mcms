@@ -63,3 +63,4 @@ echo $OUTPUT->heading(get_string('page:list', 'local_mcms'), 3);
 echo $mform->render();
 echo $renderer->render($pagelist);
 echo $OUTPUT->footer();
+global $OUTPUT, $PAGE;

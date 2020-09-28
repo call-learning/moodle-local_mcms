@@ -46,9 +46,7 @@ class renderer extends plugin_renderer_base {
      * @param page_list_renderable $pagelist
      */
     public function render_page_list(page_list_renderable $pagelist) {
-
         global $CFG;
-
         $pagelist->pagelist->out($pagelist->perpage, true);
     }
 }

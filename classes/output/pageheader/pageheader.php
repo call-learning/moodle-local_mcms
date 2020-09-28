@@ -1,4 +1,5 @@
 <?php
+
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -15,7 +16,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Configurable page
+ * Moodle Mini CMS utility.
  *
  * Provide the ability to manage site pages through blocks.
  *
@@ -24,29 +25,23 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$capabilities = array(
-    'local/mcms:managepages' => array(
-        'riskbitmask' => RISK_SPAM,
-        'captype' => 'write',
-        'contextlevel' => CONTEXT_MODULE,
-        'archetypes' => array(
-            'manager' => CAP_ALLOW
-        )
-    ),
-    'local/mcms:editpage' => array(
-        'riskbitmask' => RISK_SPAM,
-        'captype' => 'write',
-        'contextlevel' => CONTEXT_MODULE,
-        'archetypes' => array(
-            'manager' => CAP_ALLOW
-        )
-    ),
-    'local/mcms:viewpageimage' => array(
-        'riskbitmask' => RISK_SPAM,
-        'captype' => 'write',
-        'contextlevel' => CONTEXT_MODULE,
-        'archetypes' => array(
-            'manager' => CAP_ALLOW
-        )
-    )
-);
+namespace local_mcms\output\pageheader;
+
+use local_mcms\page;
+
+class pageheader implements \renderable {
+    public $pagecontext = null;
+    public $currentstyle = 'default';
+
+    public function __construct(page $page) {
+        if ($page->get('style')) {
+            $this->currentstyle = $page->get('style');
+        }
+        $this->pagecontext = new \stdClass();
+        $this->pagecontext = $page->to_record();
+        $this->pagecontext->imagesurl = [];
+        foreach (\local_mcms\page_utils::get_page_images_urls($page->get('id')) as $url) {
+            $this->pagecontext->imagesurl[] = $url->out();
+        }
+    }
+}

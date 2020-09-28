@@ -1,4 +1,5 @@
 <?php
+
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -15,7 +16,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Configurable page
+ * Moodle Mini CMS utility.
  *
  * Provide the ability to manage site pages through blocks.
  *
@@ -24,29 +25,20 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$capabilities = array(
-    'local/mcms:managepages' => array(
-        'riskbitmask' => RISK_SPAM,
-        'captype' => 'write',
-        'contextlevel' => CONTEXT_MODULE,
-        'archetypes' => array(
-            'manager' => CAP_ALLOW
-        )
-    ),
-    'local/mcms:editpage' => array(
-        'riskbitmask' => RISK_SPAM,
-        'captype' => 'write',
-        'contextlevel' => CONTEXT_MODULE,
-        'archetypes' => array(
-            'manager' => CAP_ALLOW
-        )
-    ),
-    'local/mcms:viewpageimage' => array(
-        'riskbitmask' => RISK_SPAM,
-        'captype' => 'write',
-        'contextlevel' => CONTEXT_MODULE,
-        'archetypes' => array(
-            'manager' => CAP_ALLOW
-        )
-    )
-);
+namespace local_mcms\output\pageheader;
+
+use plugin_renderer_base;
+
+class renderer extends plugin_renderer_base {
+    /**
+     *
+     * Render page header
+     */
+    protected function render_pageheader(pageheader $pageheader) {
+        try {
+            return $this->render_from_template("local_mcms/mcmspage_style_{$pageheader->currentstyle}", $pageheader->pagecontext);
+        } catch (moodle_exception $e) {
+            return $this->render_from_template("local_mcms/mcmspage_style_default", $pageheader->pagecontext);
+        }
+    }
+}

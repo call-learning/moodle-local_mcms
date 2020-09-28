@@ -39,6 +39,38 @@ defined('MOODLE_INTERNAL') || die();
 class page extends \core\persistent {
     const TABLE = 'local_mcms_page';
 
+    public function __construct($id = 0, \stdClass $record = null) {
+        global $CFG;
+        $clonedrecord = $record;
+        if ($record) {
+            $clonedrecord = clone $record;
+            if (isset($record->pageroles)) {
+                unset($clonedrecord->pageroles);
+            }
+            if (isset($record->image_filemanager)) {
+                unset($clonedrecord->image_filemanager);
+            }
+            if (isset($record->description) && (is_array($record->description))) {
+                $clonedrecord->descriptionformat = $record->description['format'];
+                $clonedrecord->description = $record->description['text'];
+            }
+        }
+        parent::__construct($id, $clonedrecord);
+    }
+
+    /**
+     * Get a page by its ID Number
+     *
+     * @param $idnumber
+     * @return static
+     * @throws \dml_exception
+     */
+    public static function get_record_by_idnumber($idnumber) {
+        global $DB;
+        $record  = $DB->get_record(self::TABLE, array('idnumber' => $idnumber));
+        $persistents = new static(0, $record);
+        return $persistents;
+    }
     /**
      * Usual properties definition for a persistent
      *
@@ -57,13 +89,34 @@ class page extends \core\persistent {
             'idnumber' => array(
                 'type' => PARAM_ALPHANUMEXT,
                 'default' => ''
-            )
+            ),
+            'description' => array(
+                'type' => PARAM_CLEANHTML,
+                'default' => ''
+            ),
+            'descriptionformat' => array(
+                'type' => PARAM_INT,
+                'default' => ''
+            ),
+            'parent' => array(
+                'type' => PARAM_INT,
+                'default' => ''
+            ),
+            'style' => array(
+                'type' => PARAM_ALPHANUMEXT,
+                'default' => ''
+            ),
+            'ctalink' => array(
+                'type' => PARAM_URL,
+                'default' => ''
+            ),
         );
     }
 
     /**
      * Get the page associated roles
      * This is the static version and avoid building a page object to get this information.
+     *
      * @param $pageid
      * @return page_role[]
      */
@@ -84,6 +137,7 @@ class page extends \core\persistent {
 
     /**
      * Update associated role
+     *
      * @param $rolesid
      * @throws \coding_exception
      * @throws \core\invalid_persistent_exception
@@ -95,6 +149,7 @@ class page extends \core\persistent {
             $role->create();
         }
     }
+
     public function delete_associated_roles() {
         $roles = page_role::get_records(['pageid' => $this->get('id')]);
         foreach ($roles as $r) {

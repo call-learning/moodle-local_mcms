@@ -27,15 +27,15 @@
 
 use local_mcms\event\page_updated;
 use local_mcms\page;
-use local_mcms\page_role;
 
 require_once(__DIR__ . '/../../../../config.php');
 
 global $CFG;
 require_once($CFG->libdir . '/adminlib.php');
 require_once('add_edit_form.php');
+$contextsystem = context_system::instance();
 require_login();
-require_capability('local/mcms:managepages', context_system::instance());
+require_capability('local/mcms:managepages', $contextsystem);
 admin_externalpage_setup('managepage');
 
 $id = required_param('id', PARAM_INT);
@@ -53,40 +53,59 @@ $PAGE->navbar->add($header, null);
 
 $page = new page($id);
 
-$pagedata = (array) $page->to_record();
-$pagedata['persistent'] = 0;
+$pagedata = [];
+$pagedata['persistent'] = $page;
 
 // Get associated roles.
 $pagedata['pageroles'] = array_map(function($r) {
-    return $r->get('id');
+    return $r->get('roleid');
 }, $page->get_associated_roles());
+$imagedraftitemid = file_get_submitted_draft_itemid('image_filemanager');
+file_prepare_draft_area($imagedraftitemid,
+    $contextsystem->id,
+    \local_mcms\page_utils::PLUGIN_FILE_COMPONENT,
+    \local_mcms\page_utils::PLUGIN_FILE_AREA_IMAGE,
+    $id,
+    add_edit_form::get_images_options());
+$pagedata['image_filemanager'] = $imagedraftitemid;
 
 $mform = new add_edit_form(null, $pagedata);
-$mform->set_data($pagedata);
 
 $listpageurl = new moodle_url($CFG->wwwroot . '/local/mcms/admin/page/list.php');
 if ($mform->is_cancelled()) {
     redirect($listpageurl);
 }
-
-echo $OUTPUT->header();
+$errornotification = '';
 if ($data = $mform->get_data()) {
-    $pagedata = clone $data;
-    unset($pagedata->pageroles);
-    $page = new page($pagedata->id, $pagedata);
-    $page->update();
-    $page->update_associated_roles($data->pageroles);
-    $action = get_string('pageinfoupdated', 'local_mcms');
-    $eventparams = array('objectid' => $page->get('id'),
-        'context' => context_system::instance(),
-        'other' => array(
-            'actions' => $action
-        ));
-    $event = page_updated::create($eventparams);
-    $event->trigger();
-    echo $OUTPUT->notification($action, 'notifysuccess');
-    echo $OUTPUT->single_button($listpageurl, get_string('continue'));
-} else {
-    $mform->display();
+    try {
+        $page = new page($id, $data);
+        $page->update();
+        $page->update_associated_roles($data->pageroles);
+        $data = file_postupdate_standard_filemanager($data,
+            'image',
+            $mform->get_images_options(),
+            $contextsystem,
+            \local_mcms\page_utils::PLUGIN_FILE_COMPONENT,
+            \local_mcms\page_utils::PLUGIN_FILE_AREA_IMAGE,
+            $id);
+        $action = get_string('pageinfoupdated', 'local_mcms');
+        $eventparams = array('objectid' => $page->get('id'),
+            'context' => context_system::instance(),
+            'other' => array(
+                'actions' => $action
+            ));
+        $event = page_updated::create($eventparams);
+        $event->trigger();
+        /* @var core_renderer $OUTPUT */
+        redirect($listpageurl,
+            get_string('pageinfoupdated', 'local_mcms'),
+            null,
+            $messagetype = \core\output\notification::NOTIFY_SUCCESS);
+    } catch (moodle_exception $e) {
+        $errornotification = $OUTPUT->notification($e->getMessage(), 'notifyfailure');
+    }
 }
+echo $OUTPUT->header();
+echo $errornotification;
+$mform->display();
 echo $OUTPUT->footer();

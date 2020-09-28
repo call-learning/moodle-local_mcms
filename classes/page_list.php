@@ -66,6 +66,7 @@ class page_list extends table_sql {
         $cols = array();
         $headers = array();
         $this->define_columns(array_merge($cols, array('title',
+            'image',
             'shortname',
             'roles',
             'idnumber',
@@ -74,14 +75,15 @@ class page_list extends table_sql {
             'timemodified',
             'actions')));
         $this->define_headers(array_merge($headers, array(
-                get_string('title', 'local_mcms'),
-                get_string('shortname', 'local_mcms'),
-                get_string('roles', 'local_mcms'),
-                get_string('idnumber', 'local_mcms'),
-                get_string('usermodified', 'local_mcms'),
-                get_string('timecreated', 'local_mcms'),
-                get_string('timemodified', 'local_mcms'),
-                get_string('actions', 'local_mcms')
+                get_string('page:title', 'local_mcms'),
+                get_string('page:image', 'local_mcms'),
+                get_string('page:shortname', 'local_mcms'),
+                get_string('page:roles', 'local_mcms'),
+                get_string('page:idnumber', 'local_mcms'),
+                get_string('page:usermodified', 'local_mcms'),
+                get_string('page:timecreated', 'local_mcms'),
+                get_string('page:timemodified', 'local_mcms'),
+                get_string('page:actions', 'local_mcms')
             )
         ));
         $this->collapsible(false);
@@ -135,6 +137,21 @@ class page_list extends table_sql {
             $dateformat = get_string('strftimedatetimeshort', 'core_langconfig');
         }
         return userdate($time, $dateformat);
+    }
+
+    /**
+     * Generate the image column.
+     *
+     * @param stdClass $page page data
+     * @return string HTML for the time column
+     */
+    public function col_image($page) {
+        $imagesurls = page_utils::get_page_images_urls($page->id);
+        $imageshtml = '';
+        foreach ($imagesurls as $src) {
+            $imageshtml .= \html_writer::img($src, 'page-image', array('class' => 'img-thumbnail'));
+        }
+        return $imageshtml;
     }
 
     /**

@@ -51,17 +51,34 @@ $string['pagefilter:title:desc'] = 'Full Name (Descending)';
 $string['pagefilter:timemodified:desc'] = 'Time Modified (Descending)';
 $string['pagefilter:timemodified:asc'] = 'Time Modified (Ascending)';
 
-// Column label.
-$string['idnumber'] = 'Unique Identifier (URL)';
-$string['rolename'] = 'Role Name';
-$string['roles'] = 'Roles';
-$string['pagefilter:orderby'] = 'Order By';
-$string['title'] = 'Full Name';
-$string['shortname'] = 'Short Name';
-$string['usermodified'] = 'User Modified';
-$string['timecreated'] = 'Time created';
-$string['timemodified'] = 'Time modified';
-$string['actions'] = 'Actions';
+// Column label and Add/edit Label.
+
+$string['page:title'] = 'Page title';
+$string['page:title_help'] = 'Page title is the main title for the page';
+$string['page:shortname'] = 'Page Shortname';
+$string['page:shortname_help'] = 'Page Shortname as a unique identifier for the page and displayed in breadcrumbs';
+$string['page:idnumber'] = 'Page ID (pretty url)';
+$string['page:idnumber_help'] = 'This is a unique identifier for a page, in the form of a nice URL. For example my-page.'
+.'The view url will be /local/mcms/index.php?p=my-page';
+$string['page:description'] = 'Page Description';
+$string['page:description_help'] = 'Page Description is the page description displayed at the top of the page';
+$string['page:image'] = 'Page Image';
+$string['page:image_help'] = 'Page Image as hero image';
+
+$string['page:roles'] = 'Page Roles';
+$string['page:roles_help'] = 'Page Roles that are allowed to view the page';
+$string['page:parent'] = 'Page Parent';
+$string['page:parent_help'] = 'Page Parent so it will appear under in the different menu and hierarchy';
+$string['page:style'] = 'Page Style';
+$string['page:style_help'] = 'Page Style as defined by theme templates (mcmspage_style_xxx.mustache)';
+$string['page:ctalink'] = 'Page CTA link';
+$string['page:ctalink_help'] = 'Page CTA link';
+$string['page:image'] = 'Page Image';
+$string['page:image_help'] = 'Page Main Image (hero)';
+$string['page:usermodified'] = 'User Modified';
+$string['page:timecreated'] = 'Time created';
+$string['page:timemodified'] = 'Time modified';
+$string['page:actions'] = 'Actions';
 
 // Add/Edit form.
 $string['page:add'] = 'Add page';
@@ -69,10 +86,7 @@ $string['page:edit'] = 'Edit page';
 $string['page:delete'] = 'Delete page';
 $string['page:list'] = 'All pages';
 
-$string['pagetitle'] = 'Page title';
-$string['pageshortname'] = 'Page Shortname';
-$string['pageidnumber'] = 'Page ID (pretty url)';
-$string['pageroles'] = 'Page Roles';
+
 
 // Events.
 $string['pageadded'] = 'Page Added';
@@ -84,3 +98,8 @@ $string['pageinfoupdated'] = 'Page Info Updated';
 $string['pageaction:view'] = 'View page';
 $string['pageaction:edit'] = 'Edit page';
 $string['pageaction:delete'] = 'Delete page';
+
+// Styles.
+
+$string['pagestyle:default'] = 'Default Style';
+$string['pagestyle:cta'] = 'CALL To Action Style';
