@@ -37,11 +37,12 @@ $edit = optional_param('edit', null, PARAM_BOOL);    // Turn editing on and off
 require_login();
 
 $page = null;
-if (!$pageid && !$pageidnumber) {
+if (!$pageid && $pageidnumber) {
     if (!$pageidnumber) {
         print_error('pageoridnumbermssing', 'local_mcms');
     }
     $page = page::get_record_by_idnumber($pageidnumber);
+    $pageid = $page->get('id');
 } else {
     $page = new page($pageid);
 }
@@ -53,11 +54,8 @@ if (!$page) {
 $context = context_system::instance();
 
 // Check user can view the page.
-$canviewpage = $isadmin = has_capability('moodle/site:config', $context);
+$canviewpage = page::can_view_page($USER, $page, $context);
 
-foreach ($page->get_associated_roles() as $role) {
-    $canviewpage |= user_has_role_assignment($USER->id, $role->get('roleid'));
-}
 if (!$canviewpage) {
     print_error('cannotviewpage', 'local_mcms');
 }
@@ -99,7 +97,10 @@ if ($PAGE->user_allowed_editing()) {
     $url = new moodle_url("$CFG->wwwroot/local/mcms/admin/page/list.php", $params);
     $pagelist = $OUTPUT->single_button($url, get_string('page:list', 'local_mcms'));
 
-    $PAGE->set_button($pagelist . $editbutton);
+    $params = ['id'=>$pageid];
+    $url = new moodle_url("$CFG->wwwroot/local/mcms/admin/page/edit.php", $params);
+    $edit = $OUTPUT->single_button($url, get_string('edit'));
+    $PAGE->set_button($pagelist . $edit . $editbutton);
 } else {
     $USER->editing = $edit = 0;
 }
@@ -122,6 +123,6 @@ echo $renderer->custom_block_region('content');
 echo $renderer->footer();
 
 // Trigger the page has been viewed event.
-$eventparams = array('context' => $context, 'objectid' => $page->get('id'));
+$eventparams = array('context' => $context, 'objectid' => $pageid);
 $event = local_mcms\event\page_viewed::create($eventparams);
 $event->trigger();

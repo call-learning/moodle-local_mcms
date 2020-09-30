@@ -26,14 +26,11 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$string['pluginname'] = 'Moodle Mini CMS';
-
-$string['pagemanagement'] = 'Mini CMS Page management';
-$string['mcmsgeneralsettings'] = 'General Settings';
-$string['managepages'] = 'Manage pages';
 $string['enablemcms'] = 'Enable Moodle Mini CMS';
 $string['enablemcms_help'] = 'Moodle Mini CMS allow to pages that are made of blocks. Blocks can be customized at will.';
-
+$string['managepages'] = 'Manage pages';
+$string['mcmsgeneralsettings'] = 'General Settings';
+$string['pagemanagement'] = 'Mini CMS Page management';
 $string['page:list'] = 'List Pages';
 
 // Filter labels.
@@ -59,7 +56,7 @@ $string['page:shortname'] = 'Page Shortname';
 $string['page:shortname_help'] = 'Page Shortname as a unique identifier for the page and displayed in breadcrumbs';
 $string['page:idnumber'] = 'Page ID (pretty url)';
 $string['page:idnumber_help'] = 'This is a unique identifier for a page, in the form of a nice URL. For example my-page.'
-.'The view url will be /local/mcms/index.php?p=my-page';
+    . 'The view url will be /local/mcms/index.php?p=my-page';
 $string['page:description'] = 'Page Description';
 $string['page:description_help'] = 'Page Description is the page description displayed at the top of the page';
 $string['page:image'] = 'Page Image';
@@ -68,13 +65,20 @@ $string['page:image_help'] = 'Page Image as hero image';
 $string['page:roles'] = 'Page Roles';
 $string['page:roles_help'] = 'Page Roles that are allowed to view the page';
 $string['page:parent'] = 'Page Parent';
-$string['page:parent_help'] = 'Page Parent so it will appear under in the different menu and hierarchy';
+$string['page:parent_help'] = 'Page Parent (not used for now)';
 $string['page:style'] = 'Page Style';
 $string['page:style_help'] = 'Page Style as defined by theme templates (mcmspage_style_xxx.mustache)';
 $string['page:ctalink'] = 'Page CTA link';
 $string['page:ctalink_help'] = 'Page CTA link';
 $string['page:image'] = 'Page Image';
 $string['page:image_help'] = 'Page Main Image (hero)';
+
+$string['page:parentmenu'] = 'Page Parent Menu (top menu above)';
+$string['page:parentmenu_help'] = 'Page parent menu so it will be attached to the menu defined in the plugin rootmenuitems settings.';
+
+$string['page:menusortorder'] = 'Page Menu sortorder';
+$string['page:menusortorder_help'] = 'Page menu sortorder. Leave it to 0 for usual page sortorder';
+
 $string['page:usermodified'] = 'User Modified';
 $string['page:timecreated'] = 'Time created';
 $string['page:timemodified'] = 'Time modified';
@@ -85,8 +89,6 @@ $string['page:add'] = 'Add page';
 $string['page:edit'] = 'Edit page';
 $string['page:delete'] = 'Delete page';
 $string['page:list'] = 'All pages';
-
-
 
 // Events.
 $string['pageadded'] = 'Page Added';
@@ -103,3 +105,23 @@ $string['pageaction:delete'] = 'Delete page';
 
 $string['pagestyle:default'] = 'Default Style';
 $string['pagestyle:cta'] = 'CALL To Action Style';
+
+$string['pluginname'] = 'Moodle Mini CMS';
+
+$string['rootmenuitems'] = 'Root menu items';
+
+$string['rootmenuitems_help'] ='A set of items that will be displayed as root menus in the page. Enter each menu item on a new line' .
+    'with format: menu text, a link URL (optional, not for a top menu item with sub-items),a '.
+    'language code or comma-separated list of codes (optional, for displaying the line to' .
+    'users of the specified language only) and  a comma separated list of roles (shortnames) separated by pipe characters. '.
+    'Lines starting with a hyphen will appear as menu items in' .
+    'the previous top level menu and ### makes a divider. For example:
+<pre>
+Courses
+-All courses|/course/
+-Course search|/course/search.php
+-###
+-FAQ|https://someurl.xyz/faq
+-Les cours des inscrits|https://someurl.xyz/pmf||es|student,teacher
+Mobile app|https://someurl.xyz/app
+</pre>';

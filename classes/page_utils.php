@@ -49,6 +49,7 @@ class page_utils {
      * Name of the page layout
      */
     const PAGE_LAYOUT_NAME = 'mcmslayout';
+
     /**
      * Get all available templates for pages
      *

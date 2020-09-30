@@ -28,7 +28,15 @@
 namespace local_mcms\output\pageheader;
 
 use local_mcms\page;
+defined('MOODLE_INTERNAL') || die();
 
+/**
+ * Page header
+ *
+ * @package   local_mcms
+ * @copyright 2020 - CALL Learning - Laurent David <laurent@call-learning>
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class pageheader implements \renderable {
     public $pagecontext = null;
     public $currentstyle = 'default';

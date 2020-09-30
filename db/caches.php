@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -16,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Moodle Mini CMS utility.
+ * Configurable page cache
  *
  * Provide the ability to manage site pages through blocks.
  *
@@ -25,29 +24,9 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_mcms\output\pageheader;
 
-use plugin_renderer_base;
-
-defined('MOODLE_INTERNAL') || die();
-
-/**
- * Class renderer
- *
- * @package   local_mcms
- * @copyright 2020 - CALL Learning - Laurent David <laurent@call-learning>
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-class renderer extends plugin_renderer_base {
-    /**
-     *
-     * Render page header
-     */
-    protected function render_pageheader(pageheader $pageheader) {
-        try {
-            return $this->render_from_template("local_mcms/mcmspage_style_{$pageheader->currentstyle}", $pageheader->pagecontext);
-        } catch (moodle_exception $e) {
-            return $this->render_from_template("local_mcms/mcmspage_style_default", $pageheader->pagecontext);
-        }
-    }
-}
+$definitions = [
+    'menu' => [
+        'mode' => cache_store::MODE_SESSION,
+    ]
+];

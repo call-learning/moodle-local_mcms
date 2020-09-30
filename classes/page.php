@@ -39,6 +39,12 @@ defined('MOODLE_INTERNAL') || die();
 class page extends \core\persistent {
     const TABLE = 'local_mcms_page';
 
+    /**
+     * page constructor.
+     *
+     * @param int $id
+     * @param \stdClass|null $record
+     */
     public function __construct($id = 0, \stdClass $record = null) {
         global $CFG;
         $clonedrecord = $record;
@@ -67,10 +73,11 @@ class page extends \core\persistent {
      */
     public static function get_record_by_idnumber($idnumber) {
         global $DB;
-        $record  = $DB->get_record(self::TABLE, array('idnumber' => $idnumber));
-        $persistents = new static(0, $record);
+        $record = $DB->get_record(self::TABLE, array('idnumber' => $idnumber));
+        $persistents = new static(null, $record);
         return $persistents;
     }
+
     /**
      * Usual properties definition for a persistent
      *
@@ -96,11 +103,11 @@ class page extends \core\persistent {
             ),
             'descriptionformat' => array(
                 'type' => PARAM_INT,
-                'default' => ''
+                'default' => 1
             ),
             'parent' => array(
                 'type' => PARAM_INT,
-                'default' => ''
+                'default' => 0
             ),
             'style' => array(
                 'type' => PARAM_ALPHANUMEXT,
@@ -109,6 +116,14 @@ class page extends \core\persistent {
             'ctalink' => array(
                 'type' => PARAM_URL,
                 'default' => ''
+            ),
+            'parentmenu' => array(
+                'type' => PARAM_ALPHANUMEXT,
+                'default' => ''
+            ),
+            'menusortorder' => array(
+                'type' => PARAM_INT,
+                'default' => 0
             ),
         );
     }
@@ -136,6 +151,24 @@ class page extends \core\persistent {
     }
 
     /**
+     * Get page URL (nice URL if available)
+     *
+     * @return \moodle_url
+     * @throws \coding_exception
+     * @throws \moodle_exception
+     */
+    public function get_url() {
+        global $CFG;
+        $parameters = [];
+        if ($this->get('idnumber')) {
+            $parameters['p'] = $this->get('idnumber');
+        } else {
+            $parameters['id'] = $this->get('id');
+        }
+        return new \moodle_url($CFG->wwwroot . '/local/mcms/index.php', $parameters);
+    }
+
+    /**
      * Update associated role
      *
      * @param $rolesid
@@ -150,11 +183,44 @@ class page extends \core\persistent {
         }
     }
 
+    /**
+     * Delete associated roles in the database
+     *
+     * @throws \coding_exception
+     */
     public function delete_associated_roles() {
         $roles = page_role::get_records(['pageid' => $this->get('id')]);
         foreach ($roles as $r) {
             $r->delete();
         }
+    }
+
+    /**
+     * Can user see a specific page ?
+     *
+     * @param \stdClass $user
+     * @param page $page
+     * @param \context $context
+     * @return bool
+     * @throws \coding_exception
+     */
+    public static function can_view_page($user, $page, $context) {
+        if (has_capability('moodle/site:config', $context)) {
+            return true; // Admin can see everything.
+        }
+        $guestrole = get_guest_role();
+        $alluserroles = get_user_roles_with_special($context);
+        $alluserrolesid = array_map(function($r) {
+            return $r->roleid;
+        }, $alluserroles);
+        if (isguestuser()) {
+            $alluserrolesid[] = $guestrole->id; // Guest user has sometimes not the guest role !!
+        }
+        $pageroles = $page->get_associated_roles();
+        $pagesrolesid = array_map(function($r) {
+            return $r->get('roleid');
+        }, $pageroles);
+        return !empty(array_intersect($pagesrolesid, $alluserrolesid));
     }
 
 }

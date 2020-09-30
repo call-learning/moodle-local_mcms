@@ -29,10 +29,9 @@ namespace local_mcms\output;
 
 use local_mcms\page_list_renderable;
 use plugin_renderer_base;
-use single_button;
+
 
 defined('MOODLE_INTERNAL') || die();
-
 
 /**
  * Report log renderer's for printing reports.
@@ -47,7 +46,7 @@ class renderer extends plugin_renderer_base {
      */
     public function render_page_list(page_list_renderable $pagelist) {
         global $CFG;
-        $pagelist->pagelist->out($pagelist->perpage, true);
+        return $pagelist->pagelist->out($pagelist->perpage, true);
     }
 }
 

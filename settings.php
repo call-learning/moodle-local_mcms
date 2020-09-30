@@ -25,34 +25,39 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-
 defined('MOODLE_INTERNAL') || die();
 
 if ($hassiteconfig) {
     $mcmsmanagement = new admin_category(
-            'mcmspagemanagement',
-            get_string('pagemanagement', 'local_mcms')
+        'mcmspagemanagement',
+        get_string('pagemanagement', 'local_mcms')
     );
 
     // General settings.
     $pagedesc = get_string('mcmsgeneralsettings', 'local_mcms');
     $generalsettingspage = new admin_settingpage('mcmsgeneral',
-            $pagedesc,
-            array('local/mcms:managepages'),
-            empty($CFG->enablemcms));
+        $pagedesc,
+        array('local/mcms:managepages'),
+        empty($CFG->enablemcms));
+
+    $generalsettingspage->add(
+        new admin_setting_configtextarea('local_mcms/rootmenuitems', new lang_string('rootmenuitems', 'local_mcms'),
+            new lang_string('rootmenuitems_help', 'local_mcms'), '', PARAM_RAW, '50', '10')
+    );
+    $mcmsmanagement->add('mcmspagemanagement', $generalsettingspage);
 
     // Page Management.
     $pagedesc = get_string('managepages', 'local_mcms');
     $pageurl = new moodle_url($CFG->wwwroot . '/local/mcms/admin/page/list.php');
 
     $mcmsmanagement->add('mcmspagemanagement',
-            new admin_externalpage(
-                    'managepage',
-                    $pagedesc,
-                    $pageurl,
-                    array('local/mcms:managepages'),
-                    empty($CFG->enablemcms)
-            )
+        new admin_externalpage(
+            'managepage',
+            $pagedesc,
+            $pageurl,
+            array('local/mcms:managepages'),
+            empty($CFG->enablemcms)
+        )
     );
 
     if (!empty($CFG->enablemcms)) {
@@ -62,8 +67,8 @@ if ($hassiteconfig) {
     // Create a global Advanced Feature Toggle.
     $optionalsubsystems = $ADMIN->locate('optionalsubsystems');
     $optionalsubsystems->add(new admin_setting_configcheckbox('enablemcms',
-                    new lang_string('enablemcms', 'local_mcms'),
-                    new lang_string('enablemcms_help', 'local_mcms'),
-                    1)
+            new lang_string('enablemcms', 'local_mcms'),
+            new lang_string('enablemcms_help', 'local_mcms'),
+            1)
     );
 }

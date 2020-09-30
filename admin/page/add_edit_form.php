@@ -22,6 +22,7 @@
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use local_mcms\menu\menu;
 use local_mcms\page;
 use local_mcms\page_role;
 use local_mcms\page_utils;
@@ -103,7 +104,17 @@ class add_edit_form extends core\form\persistent {
             array('multiple' => true));
         $mform->setType('pageroles', PARAM_RAW);
         $mform->addHelpButton('pageroles', 'page:roles', 'local_mcms');
-        // Add parent page (for structure & menu).
+
+        // This is to link the page to a top menu.
+        $menus = menu::get_all_identifiable_menus();
+        $mform->addElement('select', 'parentmenu', get_string('page:parentmenu', 'local_mcms'), $menus);
+        $mform->addHelpButton('parentmenu', 'page:parentmenu', 'local_mcms');
+
+        $styles = page_utils::get_template_styles_for_mcms();
+        $mform->addElement('text', 'menusortorder', get_string('page:menusortorder', 'local_mcms'));
+        $mform->addHelpButton('menusortorder', 'page:menusortorder', 'local_mcms');
+        $mform->setType('menusortorder', PARAM_INT);
+
         $this->add_action_buttons(true, get_string('save'));
     }
 

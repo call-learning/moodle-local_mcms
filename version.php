@@ -28,7 +28,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'local_mcms';
-$plugin->version = 2020092302;
+$plugin->version = 2020092303;
 $plugin->release = 'v0.1';
 $plugin->requires = 2019111800;
 $plugin->maturity = MATURITY_STABLE;
