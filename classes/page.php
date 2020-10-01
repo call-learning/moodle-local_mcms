@@ -213,7 +213,7 @@ class page extends \core\persistent {
         $alluserrolesid = array_map(function($r) {
             return $r->roleid;
         }, $alluserroles);
-        if (isguestuser()) {
+        if (isguestuser() || !isloggedin()) {
             $alluserrolesid[] = $guestrole->id; // Guest user has sometimes not the guest role !!
         }
         $pageroles = $page->get_associated_roles();
