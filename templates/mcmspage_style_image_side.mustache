@@ -17,6 +17,16 @@
 {{!
     Default page header.
 }}
-<div class="mcms-header-container w-100 text-white text-center page-style-default" {{#imagesurl}} style="background-image: url('{{.}}')" {{/imagesurl}}>
-            <h3 class="p-4 text-center">{{title}}</h3>
+<div class="mcms-header-container text-dark page-style-image-side">
+    <div class="container">
+        <div class="d-flex flex-row inner-block justify-content-center align-items-center position-relative">
+            <div class="flex-grow-1 p-3 text-left side-text">
+                {{#title}}<h3 class="mb-1">{{.}}</h3>{{/title}}
+                {{{descriptionhtml}}}
+            </div>
+            {{#imagesurl}}
+                <img src="{{ . }}" class="side-image p-3"/>
+            {{/imagesurl}}
+        </div>
+    </div>
 </div>

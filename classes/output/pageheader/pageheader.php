@@ -48,6 +48,16 @@ class pageheader implements \renderable {
         $this->pagecontext = new \stdClass();
         $this->pagecontext = $page->to_record();
         $this->pagecontext->imagesurl = [];
+        $text =
+            file_rewrite_pluginfile_urls($this->pagecontext->description,
+                'pluginfile.php',
+                \context_system::instance()->id,
+                \local_mcms\page_utils::PLUGIN_FILE_COMPONENT,
+                \local_mcms\page_utils::PLUGIN_FILE_AREA_IMAGE,
+                $page->get('id'));
+
+        $this->pagecontext->descriptionhtml = format_text($text, $page->get('descriptionformat'));
+
         foreach (\local_mcms\page_utils::get_page_images_urls($page->get('id')) as $url) {
             $this->pagecontext->imagesurl[] = $url->out();
         }
