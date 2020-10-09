@@ -28,6 +28,7 @@
 namespace local_mcms\output\menu;
 
 use local_mcms\menu\menu;
+use moodle_url;
 use plugin_renderer_base;
 
 defined('MOODLE_INTERNAL') || die();
@@ -75,9 +76,9 @@ class renderer extends plugin_renderer_base {
             } else {
                 $currentlang = $strlang;
             }
-            $this->language = $mcmsmenu->add($currentlang, new moodle_url('#'), $strlang, 10000);
+            $this->language = $mcmsmenu->add($currentlang,null,  new moodle_url('#'), $strlang, 10000);
             foreach ($langs as $langtype => $langname) {
-                $this->language->add($langname, new moodle_url($this->page->url, array('lang' => $langtype)), $langname);
+                $this->language->add($langname,  null, new moodle_url($this->page->url, array('lang' => $langtype)), $langname);
             }
         }
 
@@ -112,9 +113,10 @@ class renderer extends plugin_renderer_base {
             } else {
                 $currentlang = $strlang;
             }
-            $this->language = $menu->add($currentlang, new moodle_url('#'), $strlang, 10000);
+            $this->language = $menu->add($currentlang, null,
+                new moodle_url('#'), $strlang, 10000);
             foreach ($langs as $langtype => $langname) {
-                $this->language->add($langname, new moodle_url($this->page->url, array('lang' => $langtype)), $langname);
+                $this->language->add($langname, null, new moodle_url($this->page->url, array('lang' => $langtype)), $langname);
             }
         }
 

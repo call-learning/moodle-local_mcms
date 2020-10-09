@@ -28,13 +28,12 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot . '/backup/util/includes/backup_includes.php');
 
-class page_backup_controller extends backup_controller {
-
+class pages_backup_controller extends backup_controller {
     /**
      * Constructor for the backup controller class.
      *
-     * @param int $type Type of the backup; ignored as it is a different backup than usual
-     * @param int $id The ID of the item to backup; e.g the page id
+     * @param int $type Type of the backup; One of backup::TYPE_1COURSE, TYPE_1SECTION, TYPE_1ACTIVITY
+     * @param int $id The ID of the item to backup; e.g the course id
      * @param int $format The backup format to use; Most likely backup::FORMAT_MOODLE
      * @param bool $interactive Whether this backup will require user interaction; backup::INTERACTIVE_YES or INTERACTIVE_NO
      * @param int $mode One of backup::MODE_GENERAL, MODE_IMPORT, MODE_SAMESITE, MODE_HUB, MODE_AUTOMATED
@@ -42,99 +41,11 @@ class page_backup_controller extends backup_controller {
      * @param bool $releasesession Should release the session? backup::RELEASESESSION_YES or backup::RELEASESESSION_NO
      */
     public function __construct($type, $id, $format, $interactive, $mode, $userid, $releasesession = backup::RELEASESESSION_NO) {
-        $this->type = $type;
-        $this->id   = $id;
-        $this->courseid = SITEID; // Hack so security checks passes.
-        $this->format = $format;
-        $this->interactive = $interactive;
-        $this->mode = $mode;
-        $this->userid = $userid;
-        $this->releasesession = $releasesession;
-
-        // Apply some defaults.
-        $this->operation = backup::OPERATION_BACKUP;
-        $this->executiontime = 0;
-        $this->checksum = '';
-
-        // Set execution based on backup mode.
-        if ($mode == backup::MODE_ASYNC || $mode == backup::MODE_COPY) {
-            $this->execution = backup::EXECUTION_DELAYED;
-        } else {
-            $this->execution = backup::EXECUTION_INMEDIATE;
-        }
-
-        // Apply current backup version and release if necessary.
-        backup_controller_dbops::apply_version_and_release();
-
-        // Check format and type are correct.
-        backup_check::check_format_and_type($this->format, $this->type);
-
-        // Check id is correct.
-        $this->check_id($this->id);
-
-        // Check user is correct.
-        backup_check::check_user($this->userid);
-
-        // Calculate unique $backupid.
-        $this->calculate_backupid();
-
-        // Default logger chain (based on interactive/execution).
-        $this->logger = backup_factory::get_logger_chain($this->interactive, $this->execution, $this->backupid);
-
-        // By default there is no progress reporter. Interfaces that wish to
-        // display progress must set it.
-        $this->progress = new \core\progress\none();
-
-        // Instantiate the output_controller singleton and active it if interactive and immediate.
-        $oc = output_controller::get_instance();
-        if ($this->interactive == backup::INTERACTIVE_YES && $this->execution == backup::EXECUTION_INMEDIATE) {
-            $oc->set_active(true);
-        }
-
-        $this->log('instantiating backup controller', backup::LOG_INFO, $this->backupid);
-
-        // Default destination chain (based on type/mode/execution).
-        $this->destination = backup_factory::get_destination_chain($this->type, $this->id, $this->mode, $this->execution);
-
-        // Set initial status.
-        $this->set_status(backup::STATUS_CREATED);
-
-        // Load plan (based on type/format).
-        $this->load_plan();
-
-        // Apply all default settings (based on type/format/mode).
-        $this->apply_defaults();
-
-        // Perform all initial security checks and apply (2nd param) them to settings automatically.
-        backup_check::check_security($this, true);
-
-        // Set status based on interactivity.
-        if ($this->interactive == backup::INTERACTIVE_YES) {
-            $this->set_status(backup::STATUS_SETTING_UI);
-        } else {
-            $this->set_status(backup::STATUS_AWAITING);
-        }
+        parent::__construct(backup::TYPE_1COURSE, $id, $format, $interactive, $mode, $userid, $releasesession = backup::RELEASESESSION_NO)
     }
-
-    /**
-     * Check identifier
-     *
-     * @param $id
-     * @return bool
-     * @throws dml_exception
-     */
-    public function check_id($id) {
-        global $DB;
-        if (!$DB->record_exists('local_mcms_page', array('id' => $id))) {
-            throw new backup_controller_exception('backup_check_module_not_exists', $id);
-        }
-
-        return true;
-    }
-
     protected function load_plan() {
         $this->log('loading controller plan', backup::LOG_DEBUG);
-        $this->plan = new page_backup_plan($this);
+        $this->plan = new site_with_pages_backup_plan($this);
         $this->plan->build(); // Build plan for this controller
         $this->set_status(backup::STATUS_PLANNED);
     }
@@ -142,7 +53,7 @@ class page_backup_controller extends backup_controller {
 }
 
 
-class page_backup_plan extends backup_plan {
+class site_with_pages_backup_plan extends backup_plan {
     public function build() {
         global $DB;
 

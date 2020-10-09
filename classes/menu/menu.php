@@ -211,7 +211,7 @@ class menu extends menu_item {
         if ($item->get_uniqueid() == $parentmenu) {
             $item->add(
                 $p->get('title'),
-                null,
+                $item->get_uniqueid() ,
                 $p->get_url(),
                 $p->get('title'),
                 $p->get('menusortorder') ? $p->get('menusortorder') : null
