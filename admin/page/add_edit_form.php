@@ -46,7 +46,7 @@ class add_edit_form extends core\form\persistent {
     /** @var array Fields to remove when getting the final data. */
     protected static $fieldstoremove = array('submitbutton');
 
-    protected static $foreignfields = array('pageroles','image_filemanager');
+    protected static $foreignfields = array('pageroles', 'image_filemanager');
 
     /**
      * The form definition.
@@ -78,7 +78,7 @@ class add_edit_form extends core\form\persistent {
 
         $imageoptions = $this->get_images_options();
 
-        $mform->addElement('filemanager', 'image_filemanager', get_string('page:image','local_mcms'), null, $imageoptions);
+        $mform->addElement('filemanager', 'image_filemanager', get_string('page:image', 'local_mcms'), null, $imageoptions);
         $mform->addHelpButton('image_filemanager', 'page:image', 'local_mcms');
 
         $styles = page_utils::get_template_styles_for_mcms();
@@ -107,7 +107,7 @@ class add_edit_form extends core\form\persistent {
 
         // This is to link the page to a top menu.
         $menus = menu::get_all_identifiable_menus();
-        $mform->addElement('select', 'parentmenu', get_string('page:parentmenu', 'local_mcms'), $menus);
+        $mform->addElement('select', 'parentmenu', get_string('page:parentmenu', 'local_mcms'), $menus, 'none');
         $mform->addHelpButton('parentmenu', 'page:parentmenu', 'local_mcms');
 
         $styles = page_utils::get_template_styles_for_mcms();
@@ -131,10 +131,10 @@ class add_edit_form extends core\form\persistent {
      */
     protected function get_default_data() {
         $data = parent::get_default_data();
-        if ( !empty($this->_customdata['pageroles']))  {
+        if (!empty($this->_customdata['pageroles'])) {
             $data->pageroles = $this->_customdata['pageroles'];
         }
-        if ( !empty($this->_customdata['image_filemanager']))  {
+        if (!empty($this->_customdata['image_filemanager'])) {
             $data->image_filemanager = $this->_customdata['image_filemanager'];
         }
         return $data;

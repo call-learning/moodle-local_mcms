@@ -198,9 +198,7 @@ class menu extends menu_item {
         $allpages = page::get_records();
         foreach ($allpages as $p) {
             if (page::can_view_page($USER, $p, \context_system::instance())) {
-                foreach ($this->children as $item) {
-                    $this->add_page_in_menu($item, $p);
-                }
+                $this->add_page_in_menu($this, $p);
             }
         }
     }
@@ -208,12 +206,12 @@ class menu extends menu_item {
     protected function add_page_in_menu(menu_item $item, page $p) {
         $parentmenu = $p->get('parentmenu');
         $menusortorder = $p->get('menusortorder');
-        if ($item->get_uniqueid() == $parentmenu) {
+        if ($item->get_uniqueid() == $parentmenu ||
+            ($item->text == 'root' && $item->parent == null && $parentmenu == 'top')) {
             $item->add(
-                $p->get('title'),
-                $item->get_uniqueid() ,
+                $p->get('shortname') ? $p->get('shortname') : $p->get('title'),
+                $item->get_uniqueid(),
                 $p->get_url(),
-                $p->get('title'),
                 $p->get('menusortorder') ? $p->get('menusortorder') : null
             );
             // Then sort.
@@ -248,6 +246,7 @@ class menu extends menu_item {
 
     /**
      * Get identifiable menu items
+     *
      * @param menu_item $rootitem
      */
     protected function get_identifiable_menu_items(menu_item $rootitem) {
@@ -266,7 +265,7 @@ class menu extends menu_item {
      * @throws \dml_exception
      */
     public static function get_all_identifiable_menus() {
-        $menuitems = [];
+        $menuitems = ['none' => get_string('none'), 'top' => get_string('top')];
         $definition = get_config('local_mcms', 'rootmenuitems');
         if ($definition) {
             $menu = new menu($definition);

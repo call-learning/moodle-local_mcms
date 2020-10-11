@@ -111,17 +111,17 @@ $string['pluginname'] = 'Moodle Mini CMS';
 $string['rootmenuitems'] = 'Root menu items';
 
 $string['rootmenuitems_help'] ='A set of items that will be displayed as root menus in the page. Enter each menu item on a new line' .
-    'with format: menu text, a link URL (optional, not for a top menu item with sub-items),a '.
+    'with format: menu text, a unique id, a link URL (optional, not for a top menu item with sub-items),a '.
     'language code or comma-separated list of codes (optional, for displaying the line to' .
     'users of the specified language only) and  a comma separated list of roles (shortnames) separated by pipe characters. '.
     'Lines starting with a hyphen will appear as menu items in' .
     'the previous top level menu and ### makes a divider. For example:
 <pre>
 Courses
--All courses|/course/
--Course search|/course/search.php
+-All courses|allcourse|/course/
+-Course search|coursesearch|/course/search.php
 -###
--FAQ|https://someurl.xyz/faq
--Les cours des inscrits|https://someurl.xyz/pmf||es|student,teacher
-Mobile app|https://someurl.xyz/app
+-FAQ|faq|https://someurl.xyz/faq
+-Les cours des inscrits|lescoursdesinscrits|https://someurl.xyz/pmf||es|student,teacher
+Mobile app|mobileapp|https://someurl.xyz/app
 </pre>';
