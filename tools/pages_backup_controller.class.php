@@ -28,54 +28,60 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot . '/backup/util/includes/backup_includes.php');
 
+class plan_backup {
+    const VAR_MCMSPAGEID = -2000;
+}
 class pages_backup_controller extends backup_controller {
     /**
      * Constructor for the backup controller class.
      *
-     * @param int $type Type of the backup; One of backup::TYPE_1COURSE, TYPE_1SECTION, TYPE_1ACTIVITY
-     * @param int $id The ID of the item to backup; e.g the course id
-     * @param int $format The backup format to use; Most likely backup::FORMAT_MOODLE
      * @param bool $interactive Whether this backup will require user interaction; backup::INTERACTIVE_YES or INTERACTIVE_NO
      * @param int $mode One of backup::MODE_GENERAL, MODE_IMPORT, MODE_SAMESITE, MODE_HUB, MODE_AUTOMATED
      * @param int $userid The id of the user making the backup
      * @param bool $releasesession Should release the session? backup::RELEASESESSION_YES or backup::RELEASESESSION_NO
      */
-    public function __construct($type, $id, $format, $interactive, $mode, $userid, $releasesession = backup::RELEASESESSION_NO) {
-        parent::__construct(backup::TYPE_1COURSE, $id, $format, $interactive, $mode, $userid, $releasesession = backup::RELEASESESSION_NO)
+    public function __construct($interactive, $mode, $userid, $releasesession = backup::RELEASESESSION_NO) {
+        parent::__construct(backup::TYPE_1COURSE, SITEID, backup::FORMAT_MOODLE, $interactive, $mode, $userid,
+            $releasesession = backup::RELEASESESSION_NO);
     }
+
     protected function load_plan() {
         $this->log('loading controller plan', backup::LOG_DEBUG);
         $this->plan = new site_with_pages_backup_plan($this);
-        $this->plan->build(); // Build plan for this controller
+        $this->plan->build(); // Build plan for this controller.
         $this->set_status(backup::STATUS_PLANNED);
     }
 
 }
-
 
 class site_with_pages_backup_plan extends backup_plan {
     public function build() {
         global $DB;
 
         // Add the root task, responsible for storing global settings
-        // and some init tasks
+        // and some init tasks.
         $this->add_task(new backup_root_task('root_task'));
 
         // Get all block from the given page.
 
-        // Get the context of the course
+        // Get the context for all pages.
         $contextid = context_system::instance()->id;
 
-        // Get all the block instances for the given page id.
+        // Get all the block instances for the all pages.
         $instances = $DB->get_records(
             'block_instances',
-            array('parentcontextid' => $contextid, 'pagetypepattern'=>'mcmspage','subpagepattern'=>$this->controller->get_id()),
-            '', 'id');
+            array('parentcontextid' => $contextid,
+                'pagetypepattern' => 'mcmspage'),
+            '',
+            'id');
         foreach ($instances as $instance) {
             $this->add_task(backup_factory::get_backup_block_task($this->controller->get_format(), $instance->id));
         }
 
-        $this->add_task(new backup_mcmspage_task($this->controller->get_id(), $this));
+        $pages = $DB->get_records('local_mcms_page');
+        foreach($pages as $pagerecord) {
+            $this->add_task(new backup_mcmspage_task($pagerecord, $this));
+        }
         // Add the final task, responsible for outputting
         // all the global xml files (groups, users,
         // gradebook, questions, roles, files...) and
@@ -119,15 +125,10 @@ class backup_mcmspage_task extends backup_task {
     /**
      * Constructor - instantiates one object of this class
      */
-    public function __construct($pageid, $plan=null) {
+    public function __construct($pagerecord, $plan = null) {
         global $DB;
 
-        // Check pageid exists.
-        if (!$page = $DB->get_record('local_mcms_page', array('id' => $pageid))) {
-            throw new backup_task_exception('block_mcmspage_task_instance_not_found', $pageid);
-        }
-
-        $this->pageid = $pageid;
+        $this->pageid = $pagerecord->id;
         parent::__construct('local_mcms', $plan);
     }
 
@@ -140,7 +141,7 @@ class backup_mcmspage_task extends backup_task {
      */
     public function get_taskbasepath() {
         $basepath = $this->get_basepath();
-        $basepath .= '/mcmspage/'.$this->pageid;
+        $basepath .= '/mcmspage/' . $this->pageid;
         return $basepath;
     }
 
@@ -149,20 +150,21 @@ class backup_mcmspage_task extends backup_task {
      */
     public function build() {
 
+        $this->add_setting(new backup_activity_generic_setting(backup::VAR_MCMSPAGEID, base_setting::IS_INTEGER, $this->get_pageid()));
         // Create the block directory.
         $this->add_step(new create_taskbasepath_directory('create_mcmspage_directory'));
 
-        // Create the block.xml common file (instance + positions)
-        $this->add_step(new backup_page_instance_structure_step('page_commons', 'page.xml'));
+        // Create the mcmspage.xml common file (instance + positions).
+        $this->add_step(new backup_mcmspage_instance_structure_step('page_commons', 'mcmspage.xml'));
 
-        // Generate the roles file (optionally role assignments and always role overrides)
+        // Generate the roles file (optionally role assignments and always role overrides).
         $this->add_step(new backup_roles_structure_step('page_roles', 'roles.xml'));
 
-        // At the end, mark it as built
+        // At the end, mark it as built.
         $this->built = true;
     }
 
-    // Protected API starts here
+    // Protected API starts here.
 
     /**
      * Define the common setting that any backup block will have
@@ -191,12 +193,12 @@ class backup_mcmspage_task extends backup_task {
  * given block (instance and positions). If the block has custom DB structure
  * that will go to a separate file (different step defined in block class)
  */
-class backup_page_instance_structure_step extends backup_structure_step {
+class backup_mcmspage_instance_structure_step extends backup_structure_step {
 
     protected function define_structure() {
         global $DB;
 
-        // Define each element separated
+        // Define each element separated.
 
         $block = new backup_nested_element('page', array('id', 'contextid', 'version'), array(
             'blockname', 'parentcontextid', 'showinsubcontexts', 'pagetypepattern',
@@ -209,38 +211,38 @@ class backup_page_instance_structure_step extends backup_structure_step {
             'contextid', 'pagetype', 'subpage', 'visible',
             'region', 'weight'));
 
-        // Build the tree
+        // Build the tree.
 
         $block->add_child($positions);
         $positions->add_child($position);
 
-        // Transform configdata information if needed (process links and friends)
+        // Transform configdata information if needed (process links and friends).
         $blockrec = $DB->get_record('block_instances', array('id' => $this->task->get_blockid()));
         if ($attrstotransform = $this->task->get_configdata_encoded_attributes()) {
-            $configdata = (array)unserialize(base64_decode($blockrec->configdata));
+            $configdata = (array) unserialize(base64_decode($blockrec->configdata));
             foreach ($configdata as $attribute => $value) {
                 if (in_array($attribute, $attrstotransform)) {
                     $configdata[$attribute] = $this->contenttransformer->process($value);
                 }
             }
-            $blockrec->configdata = base64_encode(serialize((object)$configdata));
+            $blockrec->configdata = base64_encode(serialize((object) $configdata));
         }
         $blockrec->contextid = $this->task->get_contextid();
-        // Get the version of the block
-        $blockrec->version = get_config('block_'.$this->task->get_blockname(), 'version');
+        // Get the version of the block.
+        $blockrec->version = get_config('block_' . $this->task->get_blockname(), 'version');
 
-        // Define sources
+        // Define sources.
 
         $block->set_source_array(array($blockrec));
 
         $position->set_source_table('block_positions', array('blockinstanceid' => backup::VAR_PARENTID));
 
-        // File anotations (for fileareas specified on each block)
+        // File anotations (for fileareas specified on each block).
         foreach ($this->task->get_fileareas() as $filearea) {
             $block->annotate_files('block_' . $this->task->get_blockname(), $filearea, null);
         }
 
-        // Return the root element (block)
+        // Return the root element (block).
         return $block;
     }
 }
