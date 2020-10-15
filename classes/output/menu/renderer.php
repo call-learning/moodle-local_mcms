@@ -64,24 +64,6 @@ class renderer extends plugin_renderer_base {
     public function mcms_menu_menu_flat() {
         $definitions = get_config('local_mcms', 'rootmenuitems');
         $mcmsmenu = new menu($definitions, current_language());
-
-        $langs = get_string_manager()->get_list_of_translations();
-        $haslangmenu = $this->lang_menu() != '';
-
-        if ($haslangmenu) {
-            $strlang = get_string('language');
-            $currentlang = current_language();
-            if (isset($langs[$currentlang])) {
-                $currentlang = $langs[$currentlang];
-            } else {
-                $currentlang = $strlang;
-            }
-            $this->language = $mcmsmenu->add($currentlang,null,  new moodle_url('#'), $strlang, 10000);
-            foreach ($langs as $langtype => $langname) {
-                $this->language->add($langname,  null, new moodle_url($this->page->url, array('lang' => $langtype)), $langname);
-            }
-        }
-
         return $mcmsmenu->export_for_template($this);
     }
 
@@ -98,27 +80,6 @@ class renderer extends plugin_renderer_base {
      * @throws \moodle_exception
      */
     protected function render_menu(menu $menu) {
-        $langs = get_string_manager()->get_list_of_translations();
-        $haslangmenu = $this->lang_menu() != '';
-
-        if (!$menu->has_children() && !$haslangmenu) {
-            return '';
-        }
-
-        if ($haslangmenu) {
-            $strlang = get_string('language');
-            $currentlang = current_language();
-            if (isset($langs[$currentlang])) {
-                $currentlang = $langs[$currentlang];
-            } else {
-                $currentlang = $strlang;
-            }
-            $this->language = $menu->add($currentlang, null,
-                new moodle_url('#'), $strlang, 10000);
-            foreach ($langs as $langtype => $langname) {
-                $this->language->add($langname, null, new moodle_url($this->page->url, array('lang' => $langtype)), $langname);
-            }
-        }
 
         $content = '';
         foreach ($menu->get_children() as $item) {

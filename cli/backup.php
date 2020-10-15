@@ -67,10 +67,9 @@ if ($options['pageid']) {
     global $USER;
     $adminuser = get_admin();
     $pageid = $options['pageid'];
-    require_once($CFG->dirroot.'/local/mcms/tools/page_backup_controller.class.php');
+    require_once($CFG->dirroot.'/local/mcms/tools/pages_backup_controller.class.php');
 
-    $bc = new page_backup_controller(backup::TYPE_1COURSE, $pageid, backup::FORMAT_MOODLE,
-        backup::INTERACTIVE_YES, backup::MODE_GENERAL, $adminuser->id);
+    $bc = new pages_backup_controller(backup::INTERACTIVE_YES, backup::MODE_GENERAL, $adminuser->id);
     $format = $bc->get_format();
     $type = $bc->get_type();
     $id = $bc->get_id();

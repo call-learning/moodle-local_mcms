@@ -35,7 +35,7 @@ use stdClass;
 use table_sql;
 
 /**
- * Table log class for displaying logs.
+ * Page list
  *
  * @package   local_mcms
  * @copyright 2020 - CALL Learning - Laurent David <laurent@call-learning>
@@ -55,7 +55,7 @@ class page_list extends table_sql {
      * @param string $uniqueid unique id of form.
      * @param stdClass $filterparams (optional) filter params.
      * @throws \coding_exception
-     * @see page_list::get_filter_definition() for filter definition
+     * @see \local_mcms\page_list_filter_form::get_filter_definition() for filter definition
      */
     public function __construct($uniqueid, $filterparams = null) {
         parent::__construct($uniqueid);
@@ -332,29 +332,5 @@ class page_list extends table_sql {
         if ($useinitialsbar && !$this->is_downloading()) {
             $this->initialbars($total > $pagesize);
         }
-    }
-
-    /**
-     * Return filter defintion
-     *
-     * @return array
-     * @throws \coding_exception
-     */
-    public static function get_filter_definition() {
-        return array(
-            'shortname' => (object) ['type' => PARAM_TEXT, 'default' => ''],
-            'title' => (object) ['type' => PARAM_TEXT, 'default' => ''],
-            'idnumber' => (object) ['type' => PARAM_TEXT, 'default' => ''],
-            'rolename' => (object) ['type' => PARAM_TEXT, 'default' => ''],
-            'usermodified' => (object) ['type' => PARAM_TEXT, 'default' => ''],
-            'orderby' => (object) ['type' => PARAM_TEXT,
-                'choices' => [
-                    'title ASC' => get_string('pagefilter:title:asc', 'local_mcms'),
-                    'title DESC' => get_string('pagefilter:title:desc', 'local_mcms'),
-                    'timemodified ASC' => get_string('pagefilter:timemodified:asc', 'local_mcms'),
-                    'timemodified DESC' => get_string('pagefilter:timemodified:desc', 'local_mcms')
-                ],
-                'default' => 'title ASC'],
-        );
     }
 }

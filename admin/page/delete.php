@@ -57,7 +57,6 @@ $PAGE->set_url($pageurl);
 echo $OUTPUT->header();
 if (!$confirm) {
     $confirmurl = new moodle_url($pageurl, array('confirm' => true, 'id' => $id, 'sesskey' => sesskey()));
-    $cancelurl = new moodle_url($CFG->wwwroot . '/local/mcms/admin/page/list.php');
     echo $OUTPUT->confirm(get_string('page:delete', 'local_mcms'), $confirmurl, $listpageurl);
 } else {
     require_sesskey();

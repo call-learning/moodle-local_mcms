@@ -39,12 +39,38 @@ require_once($CFG->libdir . '/formslib.php');
 class page_list_filter_form extends \moodleform {
 
     /**
+     * Return filter defintion
+     *
+     * @return array
+     * @throws \coding_exception
+     */
+    public static function get_filter_definition() {
+        return array(
+            'shortname' => (object) ['type' => PARAM_TEXT, 'default' => ''],
+            'title' => (object) ['type' => PARAM_TEXT, 'default' => ''],
+            'idnumber' => (object) ['type' => PARAM_TEXT, 'default' => ''],
+            'rolename' => (object) ['type' => PARAM_TEXT, 'default' => ''],
+            'usermodified' => (object) ['type' => PARAM_TEXT, 'default' => ''],
+            'orderby' => (object) ['type' => PARAM_TEXT,
+                'choices' => [
+                    'title ASC' => get_string('pagefilter:title:asc', 'local_mcms'),
+                    'title DESC' => get_string('pagefilter:title:desc', 'local_mcms'),
+                    'timemodified ASC' => get_string('pagefilter:timemodified:asc', 'local_mcms'),
+                    'timemodified DESC' => get_string('pagefilter:timemodified:desc', 'local_mcms')
+                ],
+                'default' => 'title ASC'],
+        );
+    }
+
+    /**
      * The form definition.
+     *
+     * @throws \coding_exception
      */
     public function definition() {
         $mform = $this->_form;
 
-        foreach (\local_mcms\page_list::get_filter_definition() as $filtername => $filterdef) {
+        foreach (self::get_filter_definition() as $filtername => $filterdef) {
             $default = empty($this->_customdata[$filtername]) ? $filterdef->default : $this->_customdata[$filtername];
             switch ($filterdef->type) {
                 default:

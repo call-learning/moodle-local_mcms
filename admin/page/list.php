@@ -35,7 +35,7 @@ admin_externalpage_setup('managepage');
 
 // Get filter parameters.
 $filtervalues = [];
-foreach (\local_mcms\page_list::get_filter_definition() as $filtername => $filterdef) {
+foreach (\local_mcms\page_list_filter_form::get_filter_definition() as $filtername => $filterdef) {
     $filtervalues[$filtername] = optional_param($filtername, $filterdef->default, $filterdef->type);
 }
 
