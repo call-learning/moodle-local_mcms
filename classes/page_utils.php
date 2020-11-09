@@ -26,6 +26,8 @@
 
 namespace local_mcms;
 
+use theme_clboost\output\mustache_template_finder;
+
 defined('MOODLE_INTERNAL') || die();
 
 /**
@@ -62,17 +64,17 @@ class page_utils {
             'default' => get_string('pagestyle:default', 'local_mcms'),
             'cta' => get_string('pagestyle:cta', 'local_mcms'),
         ];
-        if (method_exists($OUTPUT, 'get_mustache_template_finder')) {
-            $templatesfinder = $OUTPUT->get_mustache_template_finder();
-            $templatedirs = $templatesfinder->get_template_directories_for_component('local_mcms');
-            foreach ($templatedirs as $dir) {
-                $prefix = $dir . '/mcmspage_style';
-                foreach (glob($prefix . '*.mustache') as $style) {
-                    $filename = basename($style);
-                    $basestyle = substr($filename, strlen('mcmspage_style_'), -strlen('.mustache'));
-                    if (!isset($styles[$basestyle])) {
-                        $styles[$basestyle] = $basestyle;
-                    }
+        $templatefinder = class_exists('\\theme_clboost\\output\\mustache_template_finder') ?
+            new \theme_clboost\output\mustache_template_finder() : new mustache_template_finder();
+
+        $templatedirs = $templatefinder->get_template_directories_for_component('local_mcms');
+        foreach ($templatedirs as $dir) {
+            $prefix = $dir . '/mcmspage_style';
+            foreach (glob($prefix . '*.mustache') as $style) {
+                $filename = basename($style);
+                $basestyle = substr($filename, strlen('mcmspage_style_'), -strlen('.mustache'));
+                if (!isset($styles[$basestyle])) {
+                    $styles[$basestyle] = $basestyle;
                 }
             }
         }
@@ -83,7 +85,7 @@ class page_utils {
      * Get associated images
      *
      * @param int $pageid
-     * @return string
+     * @return array
      * @throws \coding_exception
      * @throws \dml_exception
      */
