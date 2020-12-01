@@ -130,6 +130,13 @@ class page_list extends table_sql {
         return $this->userfullnames[$userid];
     }
 
+    /**
+     * Get time as a user friendly display
+     *
+     * @param int $time
+     * @return string
+     * @throws \coding_exception
+     */
     protected function get_time($time) {
         if (empty($this->download)) {
             $dateformat = get_string('strftimedatetime', 'core_langconfig');

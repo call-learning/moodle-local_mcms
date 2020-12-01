@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -42,10 +41,11 @@ defined('MOODLE_INTERNAL') || die();
  */
 class renderer extends plugin_renderer_base {
     /**
+     * Render page list
+     *
      * @param page_list_renderable $pagelist
      */
     public function render_page_list(page_list_renderable $pagelist) {
-        global $CFG;
         return $pagelist->pagelist->out($pagelist->perpage, true);
     }
 }

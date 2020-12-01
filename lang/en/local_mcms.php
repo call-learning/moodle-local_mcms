@@ -74,7 +74,8 @@ $string['page:image'] = 'Page Image';
 $string['page:image_help'] = 'Page Main Image (hero)';
 
 $string['page:parentmenu'] = 'Page Parent Menu (top menu above)';
-$string['page:parentmenu_help'] = 'Page parent menu so it will be attached to the menu defined in the plugin rootmenuitems settings.';
+$string['page:parentmenu_help'] =
+    'Page parent menu so it will be attached to the menu defined in the plugin rootmenuitems settings.';
 
 $string['page:menusortorder'] = 'Page Menu sortorder';
 $string['page:menusortorder_help'] = 'Page menu sortorder. Leave it to 0 for usual page sortorder';
@@ -110,10 +111,11 @@ $string['pluginname'] = 'Moodle Mini CMS';
 
 $string['rootmenuitems'] = 'Root menu items';
 
-$string['rootmenuitems_help'] ='A set of items that will be displayed as root menus in the page. Enter each menu item on a new line' .
-    'with format: menu text, a unique id, a link URL (optional, not for a top menu item with sub-items),a '.
+$string['rootmenuitems_help'] =
+    'A set of items that will be displayed as root menus in the page. Enter each menu item on a new line' .
+    'with format: menu text, a unique id, a link URL (optional, not for a top menu item with sub-items),a ' .
     'language code or comma-separated list of codes (optional, for displaying the line to' .
-    'users of the specified language only) and  a comma separated list of roles (shortnames) separated by pipe characters. '.
+    'users of the specified language only) and  a comma separated list of roles (shortnames) separated by pipe characters. ' .
     'Lines starting with a hyphen will appear as menu items in' .
     'the previous top level menu and ### makes a divider. For example:
 <pre>

@@ -21,7 +21,6 @@
  * @copyright 2020 - CALL Learning - Laurent David <laurent@call-learning>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 defined('MOODLE_INTERNAL') || die();
 
 /**
@@ -59,4 +58,5 @@ function xmldb_local_mcms_upgrade($oldversion) {
         // Mcms savepoint reached.
         upgrade_plugin_savepoint(true, 2020092303, 'local', 'mcms');
     }
+    return true;
 }

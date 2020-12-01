@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -26,7 +25,11 @@
 
 namespace local_mcms;
 
-use theme_clboost\output\mustache_template_finder;
+use context_system;
+use local_mcms\event\page_added;
+use local_mcms\event\page_updated;
+use local_mcms\form\add_edit_form;
+use moodle_url;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -48,6 +51,11 @@ class page_utils {
     const PLUGIN_FILE_COMPONENT = 'local_mcms';
 
     /**
+     * Name of the file area for images
+     */
+    const PLUGIN_FILE_AREA_DESCRIPTION = 'description';
+
+    /**
      * Name of the page layout
      */
     const PAGE_LAYOUT_NAME = 'mcmslayout';
@@ -59,13 +67,12 @@ class page_utils {
      * @throws \coding_exception
      */
     public static function get_template_styles_for_mcms() {
-        global $OUTPUT;
         $styles = [
             'default' => get_string('pagestyle:default', 'local_mcms'),
             'cta' => get_string('pagestyle:cta', 'local_mcms'),
         ];
         $templatefinder = class_exists('\\theme_clboost\\output\\mustache_template_finder') ?
-            new \theme_clboost\output\mustache_template_finder() : new mustache_template_finder();
+            new \theme_clboost\output\mustache_template_finder() : new \core\output\mustache_template_finder();
 
         $templatedirs = $templatefinder->get_template_directories_for_component('local_mcms');
         foreach ($templatedirs as $dir) {
@@ -90,19 +97,19 @@ class page_utils {
      * @throws \dml_exception
      */
     public static function get_page_images_urls($pageid) {
-        $contextsystemid = \context_system::instance()->id;
+        $contextsystemid = context_system::instance()->id;
         $fs = get_file_storage();
         $files = $fs->get_area_files($contextsystemid,
-            \local_mcms\page_utils::PLUGIN_FILE_COMPONENT,
-            \local_mcms\page_utils::PLUGIN_FILE_AREA_IMAGE,
+            self::PLUGIN_FILE_COMPONENT,
+            self::PLUGIN_FILE_AREA_IMAGE,
             $pageid);
         $imagesurls = [];
         foreach ($files as $image) {
             if ($image->is_valid_image()) {
-                $imagesurls[] = \moodle_url::make_pluginfile_url(
+                $imagesurls[] = moodle_url::make_pluginfile_url(
                     $contextsystemid,
-                    \local_mcms\page_utils::PLUGIN_FILE_COMPONENT,
-                    \local_mcms\page_utils::PLUGIN_FILE_AREA_IMAGE,
+                    self::PLUGIN_FILE_COMPONENT,
+                    self::PLUGIN_FILE_AREA_IMAGE,
                     $pageid,
                     $image->get_filepath(),
                     $image->get_filename()
@@ -110,5 +117,72 @@ class page_utils {
             }
         }
         return $imagesurls;
+    }
+
+    /**
+     * Helper for page adding ($data is form data)
+     *
+     * @param \stdClass $data
+     * @param \moodleform $mform
+     * @param bool $isnewpage
+     * @return moodle_url
+     * @throws \coding_exception
+     * @throws \core\invalid_persistent_exception
+     * @throws \dml_exception
+     * @throws \moodle_exception
+     */
+    public static function page_add_edit($data, $isnewpage = true) {
+        global $CFG;
+        $contextsystem = context_system::instance();
+        $page = null;
+        if ($isnewpage) {
+            $page = new page(0, $data);
+            $page->create();
+        } else {
+            $page = new page($data->id, $data);
+            $page->update();
+        }
+        // Upload image from description if any.
+        $draftideditor = file_get_submitted_draft_itemid('description');
+        $description =
+            file_save_draft_area_files(
+                $draftideditor,
+                $contextsystem->id,
+                self::PLUGIN_FILE_COMPONENT,
+                self::PLUGIN_FILE_AREA_DESCRIPTION,
+                $page->get('id'),
+                add_edit_form::get_description_editor_options(),
+                $data->description,
+                false);
+        // Update description if we replaced internal images links.
+        if ($page->get('description') != $description) {
+            $page->set('description', $description);
+            $page->save();
+        }
+        $page->update_associated_roles($data->pageroles);
+        // Upload images.
+        file_postupdate_standard_filemanager($data, 'image',
+            add_edit_form::get_images_options(),
+            $contextsystem,
+            self::PLUGIN_FILE_COMPONENT,
+            self::PLUGIN_FILE_AREA_IMAGE,
+            $page->get('id'));
+
+        if ($isnewpage) {
+            $eventparams = array('objectid' => $page->get('id'), 'context' => context_system::instance());
+            $event = page_added::create($eventparams);
+            $event->trigger();
+        } else {
+            $action = get_string('pageinfoupdated', 'local_mcms');
+            $eventparams = array('objectid' => $page->get('id'),
+                'context' => context_system::instance(),
+                'other' => array(
+                    'actions' => $action
+                ));
+            $event = page_updated::create($eventparams);
+            $event->trigger();
+        }
+        $viewurl = new moodle_url($CFG->wwwroot . '/local/mcms/index.php', ['id' => $page->get('id')]);
+        return $viewurl;
     }
 }

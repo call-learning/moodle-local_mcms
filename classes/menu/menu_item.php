@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -30,6 +29,7 @@ namespace local_mcms\menu;
 use context_system;
 use moodle_url;
 use renderable;
+use renderer_base;
 use templatable;
 
 defined('MOODLE_INTERNAL') || die();
@@ -106,8 +106,8 @@ class menu_item implements renderable, templatable {
      * Adds a custom menu item as a child of this node given its properties.
      *
      * @param string $text
-     * @param moodle_url $url
      * @param string $uniqueid
+     * @param moodle_url $url
      * @param int $sort
      * @return menu_item
      */
@@ -246,11 +246,11 @@ class menu_item implements renderable, templatable {
     /**
      * Export this data so it can be used as the context for a mustache template.
      *
-     * @param \renderer_base $output Used to do a final render of any components that need to be rendered for export.
+     * @param renderer_base $output Used to do a final render of any components that need to be rendered for export.
      * @return \stdClass
-     * @throws \coding_exception
+     * @throws \coding_exception|\dml_exception
      */
-    public function export_for_template(\renderer_base $output) {
+    public function export_for_template(renderer_base $output) {
         global $CFG;
 
         require_once($CFG->libdir . '/externallib.php');

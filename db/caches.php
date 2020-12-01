@@ -23,8 +23,7 @@
  * @copyright 2020 - CALL Learning - Laurent David <laurent@call-learning>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-
+defined('MOODLE_INTERNAL') || die();
 $definitions = [
     'menu' => [
         'mode' => cache_store::MODE_SESSION,

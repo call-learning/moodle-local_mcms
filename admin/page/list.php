@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -25,6 +24,8 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use local_mcms\page_list_filter_form;
+
 require_once(__DIR__ . '/../../../../config.php');
 
 global $CFG, $PAGE, $OUTPUT;
@@ -35,7 +36,7 @@ admin_externalpage_setup('managepage');
 
 // Get filter parameters.
 $filtervalues = [];
-foreach (\local_mcms\page_list_filter_form::get_filter_definition() as $filtername => $filterdef) {
+foreach (page_list_filter_form::get_filter_definition() as $filtername => $filterdef) {
     $filtervalues[$filtername] = optional_param($filtername, $filterdef->default, $filterdef->type);
 }
 

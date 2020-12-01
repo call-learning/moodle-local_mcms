@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -72,11 +71,11 @@ class page_list_renderable implements renderable {
     /**
      * Constructor
      *
+     * @param null $filter
      * @param string $url
      * @param int $page
      * @param int $perpage
-     * @param string $order
-     * @throws \dml_exception
+     * @throws \moodle_exception
      */
     public function __construct(
         $filter = null,

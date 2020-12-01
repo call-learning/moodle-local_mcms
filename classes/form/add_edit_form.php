@@ -22,14 +22,21 @@
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+namespace local_mcms\form;
+
+defined('MOODLE_INTERNAL') || die();
+
+use context_system;
+use core\form\persistent;
+use dml_exception;
 use local_mcms\menu\menu;
 use local_mcms\page;
 use local_mcms\page_role;
 use local_mcms\page_utils;
+use stdClass;
 
-defined('MOODLE_INTERNAL') || die();
-require_once($CFG->libdir . '/formslib.php');
 global $CFG;
+require_once($CFG->libdir . '/formslib.php');
 
 /**
  * Add Form
@@ -38,22 +45,22 @@ global $CFG;
  * @copyright   2019 CALL Learning <laurent@call-learning.fr>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class add_edit_form extends core\form\persistent {
+class add_edit_form extends persistent {
 
     /** @var string The fully qualified classname. */
     protected static $persistentclass = '\\local_mcms\\page';
 
     /** @var array Fields to remove when getting the final data. */
     protected static $fieldstoremove = array('submitbutton');
-
-    protected static $foreignfields = array('pageroles', 'image_filemanager');
+    /**
+     * @var string[] Fields to remove when validating data.
+     */
+    protected static $foreignfields = array('pageroles', 'image_filemanager', 'descriptiontrust');
 
     /**
      * The form definition.
      */
     public function definition() {
-        global $CFG;
-
         $mform = $this->_form;
         $mform->addElement('hidden', 'id', 0);
         $mform->setType('id', PARAM_INT);
@@ -72,11 +79,14 @@ class add_edit_form extends core\form\persistent {
         $mform->setType('idnumber', PARAM_ALPHANUMEXT);
         $mform->addHelpButton('idnumber', 'page:idnumber', 'local_mcms');
 
-        $mform->addElement('editor', 'description', get_string('page:description', 'local_mcms'), null);
-        $mform->setType('description', PARAM_CLEANHTML);
+        $mform->addElement('editor', 'description',
+            get_string('page:description', 'local_mcms'),
+            null,
+            self::get_description_editor_options());
+        $mform->setType('description', PARAM_RAW);
         $mform->addHelpButton('description', 'page:description', 'local_mcms');
 
-        $imageoptions = $this->get_images_options();
+        $imageoptions = self::get_images_options();
 
         $mform->addElement('filemanager', 'image_filemanager', get_string('page:image', 'local_mcms'), null, $imageoptions);
         $mform->addHelpButton('image_filemanager', 'page:image', 'local_mcms');
@@ -85,7 +95,8 @@ class add_edit_form extends core\form\persistent {
         $mform->addElement('select', 'style', get_string('page:style', 'local_mcms'), $styles);
         $mform->addHelpButton('style', 'page:style', 'local_mcms');
 
-        $mform->addElement('url', 'ctalink', get_string('page:ctalink', 'local_mcms'), $styles);
+        $mform->addElement('text', 'ctalink', get_string('page:ctalink', 'local_mcms'));
+        $mform->setType('ctalink', PARAM_LOCALURL);
         $mform->addHelpButton('ctalink', 'page:ctalink', 'local_mcms');
 
         $allpages = page::get_records();
@@ -110,12 +121,28 @@ class add_edit_form extends core\form\persistent {
         $mform->addElement('select', 'parentmenu', get_string('page:parentmenu', 'local_mcms'), $menus, 'none');
         $mform->addHelpButton('parentmenu', 'page:parentmenu', 'local_mcms');
 
-        $styles = page_utils::get_template_styles_for_mcms();
         $mform->addElement('text', 'menusortorder', get_string('page:menusortorder', 'local_mcms'));
         $mform->addHelpButton('menusortorder', 'page:menusortorder', 'local_mcms');
         $mform->setType('menusortorder', PARAM_INT);
 
         $this->add_action_buttons(true, get_string('save'));
+    }
+
+    /**
+     * Get image options
+     *
+     * @return array
+     * @throws dml_exception
+     */
+    public static function get_images_options() {
+        global $CFG;
+        return array(
+            'maxfiles' => 1,
+            'maxbytes' => $CFG->maxbytes,
+            'subdirs' => 0,
+            'accepted_types' => 'web_image',
+            'context' => context_system::instance()
+        );
     }
 
     /**
@@ -141,19 +168,17 @@ class add_edit_form extends core\form\persistent {
     }
 
     /**
-     * Get image options
+     * Text editor options
      *
      * @return array
-     * @throws dml_exception
      */
-    public static function get_images_options() {
-        global $CFG;
+    public static function get_description_editor_options() {
         return array(
-            'maxfiles' => 1,
-            'maxbytes' => $CFG->maxbytes,
-            'subdirs' => 0,
-            'accepted_types' => 'web_image',
-            'context' => context_system::instance()
-        );
+            'trusttext' => false,
+            'noclean' => true,
+            'subdirs' => true,
+            'maxfiles' => EDITOR_UNLIMITED_FILES,
+            'maxbytes' => FILE_AREA_MAX_BYTES_UNLIMITED,
+            'context' => context_system::instance());
     }
 }

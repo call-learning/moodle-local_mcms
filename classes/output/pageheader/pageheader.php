@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -24,10 +23,14 @@
  * @copyright 2020 - CALL Learning - Laurent David <laurent@call-learning>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 namespace local_mcms\output\pageheader;
 
+use context_system;
 use local_mcms\page;
+use local_mcms\page_utils;
+use renderable;
+use stdClass;
+
 defined('MOODLE_INTERNAL') || die();
 
 /**
@@ -37,28 +40,41 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright 2020 - CALL Learning - Laurent David <laurent@call-learning>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class pageheader implements \renderable {
+class pageheader implements renderable {
+    /**
+     * @var stdClass|null current context for the page
+     */
     public $pagecontext = null;
+    /**
+     * @var mixed|string|null current style for the page
+     */
     public $currentstyle = 'default';
 
+    /**
+     * Pageheader constructor.
+     *
+     * @param page $page
+     * @throws \coding_exception
+     * @throws \dml_exception
+     */
     public function __construct(page $page) {
         if ($page->get('style')) {
             $this->currentstyle = $page->get('style');
         }
-        $this->pagecontext = new \stdClass();
+        $this->pagecontext = new stdClass();
         $this->pagecontext = $page->to_record();
         $this->pagecontext->imagesurl = [];
         $text =
             file_rewrite_pluginfile_urls($this->pagecontext->description,
                 'pluginfile.php',
-                \context_system::instance()->id,
-                \local_mcms\page_utils::PLUGIN_FILE_COMPONENT,
-                \local_mcms\page_utils::PLUGIN_FILE_AREA_IMAGE,
+                context_system::instance()->id,
+                page_utils::PLUGIN_FILE_COMPONENT,
+                page_utils::PLUGIN_FILE_AREA_IMAGE,
                 $page->get('id'));
 
         $this->pagecontext->descriptionhtml = format_text($text, $page->get('descriptionformat'));
 
-        foreach (\local_mcms\page_utils::get_page_images_urls($page->get('id')) as $url) {
+        foreach (page_utils::get_page_images_urls($page->get('id')) as $url) {
             $this->pagecontext->imagesurl[] = $url->out();
         }
     }

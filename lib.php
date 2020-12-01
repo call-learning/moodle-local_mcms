@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -25,27 +24,38 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use local_mcms\page;
+use local_mcms\page_utils;
+
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * Retrieve file for a specific page
+ *
+ * @param stdClass $course
+ * @param course_modinfo $cm
+ * @param context $context
+ * @param string $filearea
+ * @param array $args
+ * @param bool $forcedownload
+ * @param array $options
+ * @return false
+ * @throws coding_exception
+ * @throws moodle_exception
+ * @throws require_login_exception
+ */
 function local_mcms_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload, array $options = array()) {
+    global $USER;
     // Check the contextlevel is as expected - if your plugin is a block, this becomes CONTEXT_BLOCK, etc.
     if ($context->contextlevel != CONTEXT_SYSTEM) {
-        return false;
+        send_file_not_found();
     }
 
     // Make sure the filearea is one of those used by the plugin.
-    if ($filearea !== \local_mcms\page_utils::PLUGIN_FILE_AREA_IMAGE) {
-        return false;
+    if (!in_array($filearea,
+        array(page_utils::PLUGIN_FILE_AREA_IMAGE, page_utils::PLUGIN_FILE_AREA_DESCRIPTION))) {
+        send_file_not_found();
     }
-
-    // Make sure the user is logged in and has access to the module
-    // (plugins that are not course modules should leave out the 'cm' part).
-    require_login($course, true, $cm);
-
-    // Check the relevant capabilities - these may vary depending on the filearea being accessed.
-    //if (!has_capability('local/mcms:viewpageimage', $context)) {
-    //    return false;
-    //}
 
     // Leave this line out if you set the itemid to null in make_pluginfile_url (set $itemid to 0 instead).
     $itemid = array_shift($args); // The first item in the $args array.
@@ -61,11 +71,17 @@ function local_mcms_pluginfile($course, $cm, $context, $filearea, $args, $forced
         $filepath = '/' . implode('/', $args) . '/';
     }
 
+    // Have we got access to the file ?
+    $page = new page($itemid);
+    if (!page::can_view_page($USER, $page, $context)) {
+        send_file_not_found();
+    }
+
     // Retrieve the file from the Files API.
     $fs = get_file_storage();
-    $file = $fs->get_file($context->id, \local_mcms\page_utils::PLUGIN_FILE_COMPONENT, $filearea, $itemid, $filepath, $filename);
+    $file = $fs->get_file($context->id, page_utils::PLUGIN_FILE_COMPONENT, $filearea, $itemid, $filepath, $filename);
     if (!$file) {
-        return false; // The file does not exist.
+        send_file_not_found();
     }
 
     // We can now send the file back to the browser - in this case with a cache lifetime of 1 day and no filtering.

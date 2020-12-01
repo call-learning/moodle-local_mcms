@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -27,6 +26,7 @@
 
 namespace local_mcms\menu;
 
+use context_system;
 use local_mcms\page;
 use moodle_exception;
 use moodle_url;
@@ -56,15 +56,18 @@ class menu extends menu_item {
      *
      * @param string $definition the menu items definition in syntax required by {@link convert_text_to_menu_nodes()}
      * @param string $currentlanguage the current language code, null disables multilang support
+     * @throws \coding_exception
+     * @throws \dml_exception
+     * @throws moodle_exception
      */
     public function __construct($definition = '', $currentlanguage = null) {
         $this->currentlanguage = $currentlanguage;
-        parent::__construct('root'); // create virtual root element of the menu
+        parent::__construct('root'); // Create virtual root element of the menu.
         // TODO cache the result of the definition and page parsing.
         if (!empty($definition)) {
             $this->override_children(self::convert_text_to_menu_nodes($definition, $currentlanguage));
-            $this->add_pages_as_children();
         }
+        $this->add_pages_as_children();
     }
 
     /**
@@ -106,14 +109,12 @@ class menu extends menu_item {
      *     German only|http://moodle.de|de,de_du,de_kids
      *
      *
-     * @static
      * @param string $text the menu items definition
      * @param string $language the language code, null disables multilang support
      * @return array
      * @throws \dml_exception
      */
     public static function convert_text_to_menu_nodes($text, $language = null) {
-        global $USER;
         $alluserroles = get_user_roles(\context_system::instance());
         $alluserrolessn = array_map(function($r) {
             return $r->shortname;
@@ -158,13 +159,13 @@ class menu extends menu_item {
                                 $itemurl = null;
                             }
                             break;
-                        case 4: // Language.
+                        case 3: // Language.
                             if (!empty($language)) {
                                 $itemlanguages = array_map('trim', explode(',', $setting));
                                 $itemvisible &= in_array($language, $itemlanguages);
                             }
                             break;
-                        case 5: // Role.
+                        case 4: // Role.
                             $itemroles = array_map('trim', explode(',', $setting));
                             if (!empty($itemroles)) {
                                 $itemvisible &= empty(array_intersect($alluserrolessn, $itemroles));
@@ -193,24 +194,38 @@ class menu extends menu_item {
         return $root->get_children();
     }
 
+    /**
+     * Add all pages as children
+     *
+     * @throws \coding_exception
+     * @throws \dml_exception
+     * @throws moodle_exception
+     */
     protected function add_pages_as_children() {
         global $USER;
         $allpages = page::get_records();
         foreach ($allpages as $p) {
-            if (page::can_view_page($USER, $p, \context_system::instance())) {
+            if (page::can_view_page($USER, $p, context_system::instance())) {
                 $this->add_page_in_menu($this, $p);
             }
         }
     }
 
+    /**
+     * Add page in given menu
+     *
+     * @param menu_item $item
+     * @param page $p
+     * @throws \coding_exception
+     * @throws moodle_exception
+     */
     protected function add_page_in_menu(menu_item $item, page $p) {
         $parentmenu = $p->get('parentmenu');
-        $menusortorder = $p->get('menusortorder');
         if ($item->get_uniqueid() == $parentmenu ||
             ($item->text == 'root' && $item->parent == null && $parentmenu == 'top')) {
             $item->add(
                 $p->get('shortname') ? $p->get('shortname') : $p->get('title'),
-                $item->get_uniqueid(),
+                $p->get('idnumber'),
                 $p->get_url(),
                 $p->get('menusortorder') ? $p->get('menusortorder') : null
             );
@@ -230,7 +245,6 @@ class menu extends menu_item {
      * This function is designed to be used with the usort method
      *     usort($this->children, array('custom_menu','sort_custom_menu_items'));
      *
-     * @static
      * @param menu_item $itema
      * @param menu_item $itemb
      * @return int
@@ -245,9 +259,10 @@ class menu extends menu_item {
     }
 
     /**
-     * Get identifiable menu items
+     * Get identifiable menu items (i.e. any menu with unique id)
      *
      * @param menu_item $rootitem
+     * @return array|mixed
      */
     protected function get_identifiable_menu_items(menu_item $rootitem) {
         $identifiableitems = [];
@@ -261,6 +276,7 @@ class menu extends menu_item {
     }
 
     /**
+     * Get all menus that can be identified
      * @return array
      * @throws \dml_exception
      */

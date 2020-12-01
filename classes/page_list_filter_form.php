@@ -75,7 +75,8 @@ class page_list_filter_form extends \moodleform {
             switch ($filterdef->type) {
                 default:
                     if (!empty($filterdef->choices)) {
-                        $mform->addElement('select', $filtername, get_string('pagefilter:' . $filtername, 'local_mcms'), $filterdef->choices);
+                        $mform->addElement('select', $filtername, get_string('pagefilter:' . $filtername, 'local_mcms'),
+                            $filterdef->choices);
                         $mform->setType($filtername, $filterdef->type);
                     } else {
                         $mform->addElement('text', $filtername, get_string('pagefilter:' . $filtername, 'local_mcms'), $default);

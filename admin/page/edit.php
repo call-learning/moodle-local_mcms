@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -24,15 +23,14 @@
  * @copyright 2020 - CALL Learning - Laurent David <laurent@call-learning>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-use local_mcms\event\page_updated;
+use local_mcms\form\add_edit_form;
 use local_mcms\page;
+use local_mcms\page_utils;
 
 require_once(__DIR__ . '/../../../../config.php');
 
-global $CFG;
+global $CFG, $PAGE, $OUTPUT;
 require_once($CFG->libdir . '/adminlib.php');
-require_once('add_edit_form.php');
 $contextsystem = context_system::instance();
 require_login();
 require_capability('local/mcms:managepages', $contextsystem);
@@ -60,16 +58,37 @@ $pagedata['persistent'] = $page;
 $pagedata['pageroles'] = array_map(function($r) {
     return $r->get('roleid');
 }, $page->get_associated_roles());
+
+// Get previously loaded image.
 $imagedraftitemid = file_get_submitted_draft_itemid('image_filemanager');
 file_prepare_draft_area($imagedraftitemid,
     $contextsystem->id,
-    \local_mcms\page_utils::PLUGIN_FILE_COMPONENT,
-    \local_mcms\page_utils::PLUGIN_FILE_AREA_IMAGE,
+    page_utils::PLUGIN_FILE_COMPONENT,
+    page_utils::PLUGIN_FILE_AREA_IMAGE,
     $id,
     add_edit_form::get_images_options());
 $pagedata['image_filemanager'] = $imagedraftitemid;
 
 $mform = new add_edit_form(null, $pagedata);
+
+// Get standard editor files.
+
+$draftideditor = file_get_submitted_draft_itemid('description');
+$currendescription = file_prepare_draft_area($draftideditor,
+    context_system::instance()->id,
+    page_utils::PLUGIN_FILE_COMPONENT,
+    page_utils::PLUGIN_FILE_AREA_DESCRIPTION,
+    $page->get('id'),
+    add_edit_form::get_description_editor_options(),
+    $page->get('description')
+);
+$pagedata = $page->to_record();
+$pagedata->description = [
+    'text' => $currendescription,
+    'format' => $page->get('descriptionformat'),
+    'itemid' => $draftideditor
+];
+$mform->set_data($pagedata);
 
 $listpageurl = new moodle_url($CFG->wwwroot . '/local/mcms/admin/page/list.php');
 if ($mform->is_cancelled()) {
@@ -78,30 +97,12 @@ if ($mform->is_cancelled()) {
 $errornotification = '';
 if ($data = $mform->get_data()) {
     try {
-        $page = new page($id, $data);
-        $page->update();
-        $page->update_associated_roles($data->pageroles);
-        $data = file_postupdate_standard_filemanager($data,
-            'image',
-            $mform->get_images_options(),
-            $contextsystem,
-            \local_mcms\page_utils::PLUGIN_FILE_COMPONENT,
-            \local_mcms\page_utils::PLUGIN_FILE_AREA_IMAGE,
-            $id);
-        $action = get_string('pageinfoupdated', 'local_mcms');
-        $eventparams = array('objectid' => $page->get('id'),
-            'context' => context_system::instance(),
-            'other' => array(
-                'actions' => $action
-            ));
-        $event = page_updated::create($eventparams);
-        $event->trigger();
-        /* @var core_renderer $OUTPUT */
+        $returnurl = page_utils::page_add_edit($data, false);
         redirect($listpageurl,
             get_string('pageinfoupdated', 'local_mcms'),
             null,
             $messagetype = \core\output\notification::NOTIFY_SUCCESS);
-    } catch (moodle_exception $e) {
+    } catch (moodle_exception $e) {/**/
         $errornotification = $OUTPUT->notification($e->getMessage(), 'notifyfailure');
     }
 }

@@ -15,39 +15,34 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Configurable page
+ * Basic Tests for LCMS pages
  *
- * Provide the ability to manage site pages through blocks.
- *
- * @package   local_mcms
+ * @package   block_mcms
  * @copyright 2020 - CALL Learning - Laurent David <laurent@call-learning>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-defined('MOODLE_INTERNAL') || die();
 
-$capabilities = array(
-    'local/mcms:managepages' => array(
-        'riskbitmask' => RISK_SPAM,
-        'captype' => 'write',
-        'contextlevel' => CONTEXT_MODULE,
-        'archetypes' => array(
-            'manager' => CAP_ALLOW
-        )
-    ),
-    'local/mcms:editpage' => array(
-        'riskbitmask' => RISK_SPAM,
-        'captype' => 'write',
-        'contextlevel' => CONTEXT_MODULE,
-        'archetypes' => array(
-            'manager' => CAP_ALLOW
-        )
-    ),
-    'local/mcms:viewpageimage' => array(
-        'riskbitmask' => RISK_SPAM,
-        'captype' => 'read',
-        'contextlevel' => CONTEXT_MODULE,
-        'archetypes' => array(
-            'guest' => CAP_ALLOW
-        )
-    )
-);
+use local_mcms\page_utils;
+
+defined('MOODLE_INTERNAL') || die();
+require_once('lib.php');
+
+/**
+ * Basic Tests for LCMS pages
+ *
+ * @copyright 2020 - CALL Learning - Laurent David <laurent@call-learning>
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class local_mcms_utils_tests extends advanced_testcase {
+    use mcms_test_base;
+
+    /**
+     * Very basic test to see if function works
+     *
+     * @throws coding_exception
+     */
+    public function test_get_mcms_templates() {
+        $templates = page_utils::get_template_styles_for_mcms();
+        $this->assertNotNull($templates);
+    }
+}

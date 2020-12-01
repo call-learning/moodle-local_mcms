@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -27,6 +26,7 @@
 
 namespace local_mcms\output\pageheader;
 
+use moodle_exception;
 use plugin_renderer_base;
 
 defined('MOODLE_INTERNAL') || die();
@@ -40,8 +40,11 @@ defined('MOODLE_INTERNAL') || die();
  */
 class renderer extends plugin_renderer_base {
     /**
-     *
      * Render page header
+     *
+     * @param pageheader $pageheader
+     * @return bool|string
+     * @throws moodle_exception
      */
     protected function render_pageheader(pageheader $pageheader) {
         try {

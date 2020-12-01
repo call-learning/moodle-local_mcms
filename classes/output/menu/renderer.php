@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -28,7 +27,6 @@
 namespace local_mcms\output\menu;
 
 use local_mcms\menu\menu;
-use moodle_url;
 use plugin_renderer_base;
 
 defined('MOODLE_INTERNAL') || die();
@@ -50,6 +48,9 @@ class renderer extends plugin_renderer_base {
      * and then configuring the root menu config setting as described.
      *
      * @return string
+     * @throws \coding_exception
+     * @throws \dml_exception
+     * @throws \moodle_exception
      */
     public function mcms_menu() {
         $definitions = get_config('local_mcms', 'rootmenuitems');
@@ -73,14 +74,12 @@ class renderer extends plugin_renderer_base {
      * The custom menu this method produces makes use of the YUI3 menunav widget
      * and requires very specific html elements and classes.
      *
-     * @staticvar int $menucount
      * @param menu $menu
      * @return string
      * @throws \coding_exception
      * @throws \moodle_exception
      */
     protected function render_menu(menu $menu) {
-
         $content = '';
         foreach ($menu->get_children() as $item) {
             $context = $item->export_for_template($this);

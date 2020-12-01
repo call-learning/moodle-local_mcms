@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -28,11 +27,11 @@
 use local_mcms\page;
 
 require_once(__DIR__ . '/../../config.php');
-global $SITE, $PAGE, $USER;
+global $SITE, $CFG, $PAGE, $USER, $OUTPUT;
 
 $pageid = optional_param('id', null, PARAM_INT);
 $pageidnumber = optional_param('p', null, PARAM_ALPHANUMEXT);
-$edit = optional_param('edit', null, PARAM_BOOL);    // Turn editing on and off
+$edit = optional_param('edit', null, PARAM_BOOL);    // Turn editing on and off.
 
 require_login();
 
@@ -97,7 +96,7 @@ if ($PAGE->user_allowed_editing()) {
     $url = new moodle_url("$CFG->wwwroot/local/mcms/admin/page/list.php", $params);
     $pagelist = $OUTPUT->single_button($url, get_string('page:list', 'local_mcms'));
 
-    $params = ['id'=>$pageid];
+    $params = ['id' => $pageid];
     $url = new moodle_url("$CFG->wwwroot/local/mcms/admin/page/edit.php", $params);
     $edit = $OUTPUT->single_button($url, get_string('edit'));
     $PAGE->set_button($pagelist . $edit . $editbutton);

@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -37,6 +36,9 @@ defined('MOODLE_INTERNAL') || die();
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class page extends \core\persistent {
+    /**
+     * Related table
+     */
     const TABLE = 'local_mcms_page';
 
     /**
@@ -46,7 +48,6 @@ class page extends \core\persistent {
      * @param \stdClass|null $record
      */
     public function __construct($id = 0, \stdClass $record = null) {
-        global $CFG;
         $clonedrecord = $record;
         if ($record) {
             $clonedrecord = clone $record;
@@ -67,7 +68,7 @@ class page extends \core\persistent {
     /**
      * Get a page by its ID Number
      *
-     * @param $idnumber
+     * @param string $idnumber
      * @return static
      * @throws \dml_exception
      */
@@ -132,7 +133,7 @@ class page extends \core\persistent {
      * Get the page associated roles
      * This is the static version and avoid building a page object to get this information.
      *
-     * @param $pageid
+     * @param int $pageid
      * @return page_role[]
      */
     public static function get_page_roles($pageid) {
@@ -171,7 +172,7 @@ class page extends \core\persistent {
     /**
      * Update associated role
      *
-     * @param $rolesid
+     * @param array $rolesid
      * @throws \coding_exception
      * @throws \core\invalid_persistent_exception
      */
@@ -208,12 +209,12 @@ class page extends \core\persistent {
         if (has_capability('moodle/site:config', $context)) {
             return true; // Admin can see everything.
         }
-        $guestrole = get_guest_role();
-        $alluserroles = get_user_roles_with_special($context);
+        $alluserroles = get_user_roles_with_special($context, $user->id);
         $alluserrolesid = array_map(function($r) {
             return $r->roleid;
         }, $alluserroles);
-        if (isguestuser() || !isloggedin()) {
+        if (isguestuser($user) || empty($user->id)) {
+            $guestrole = get_guest_role();
             $alluserrolesid[] = $guestrole->id; // Guest user has sometimes not the guest role !!
         }
         $pageroles = $page->get_associated_roles();
