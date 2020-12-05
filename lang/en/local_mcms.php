@@ -20,7 +20,7 @@
  * Provide the ability to manage site pages through blocks.
  *
  * @package   local_mcms
- * @copyright 2020 - CALL Learning - Laurent David <laurent@call-learning>
+ * @copyright 2020 - CALL Learning - Laurent David <laurent@call-learning.fr>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -29,6 +29,8 @@ defined('MOODLE_INTERNAL') || die();
 $string['enablemcms'] = 'Enable Moodle Mini CMS';
 $string['enablemcms_help'] = 'Moodle Mini CMS allow to pages that are made of blocks. Blocks can be customized at will.';
 $string['managepages'] = 'Manage pages';
+$string['mcms:editpage'] = 'Edit page';
+$string['mcms:managepages'] = 'Manage page';
 $string['mcmsgeneralsettings'] = 'General Settings';
 $string['pagemanagement'] = 'Mini CMS Page management';
 $string['page:list'] = 'List Pages';

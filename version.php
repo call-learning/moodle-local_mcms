@@ -20,7 +20,7 @@
  * Provide the ability to manage site pages through blocks.
  *
  * @package   local_mcms
- * @copyright 2020 - CALL Learning - Laurent David <laurent@call-learning>
+ * @copyright 2020 - CALL Learning - Laurent David <laurent@call-learning.fr>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -28,7 +28,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'local_mcms';
-$plugin->version = 2020092304;
+$plugin->version = 2020092305;
 $plugin->release = 'v0.1';
 $plugin->requires = 2019111800;
 $plugin->maturity = MATURITY_STABLE;

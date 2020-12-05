@@ -20,7 +20,7 @@
  * Provide the ability to manage site pages through blocks.
  *
  * @package   local_mcms
- * @copyright 2020 - CALL Learning - Laurent David <laurent@call-learning>
+ * @copyright 2020 - CALL Learning - Laurent David <laurent@call-learning.fr>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 namespace local_mcms\output\pageheader;
@@ -37,7 +37,7 @@ defined('MOODLE_INTERNAL') || die();
  * Page header
  *
  * @package   local_mcms
- * @copyright 2020 - CALL Learning - Laurent David <laurent@call-learning>
+ * @copyright 2020 - CALL Learning - Laurent David <laurent@call-learning.fr>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class pageheader implements renderable {
