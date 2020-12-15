@@ -33,7 +33,7 @@ require_once('lib.php');
  * @copyright 2020 - CALL Learning - Laurent David <laurent@call-learning.fr>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class local_mcms_menu_tests extends advanced_testcase {
+class local_mcms_menu_test extends advanced_testcase {
     use mcms_test_base;
 
     protected $manager = null, $student = null;
@@ -164,23 +164,25 @@ class local_mcms_menu_tests extends advanced_testcase {
         global $DB;
         $usercontext = context_user::instance($this->manager->id);
         $this->setUser($this->manager);
-        $pageparentmenu = ['top', 'firstlevel', 'pageidnumber2'];
+        $pageparentmenu = ['top', 'firstlevelfr', 'pageidnumber2'];
         $rolesid = $DB->get_fieldset_select('role', 'id', 'shortname IN(\'guest\',\'manager\') ');
         for ($pageindex = 0; $pageindex < self::MAX_PAGE; $pageindex++) {
             $pagedef = (object) self::SAMPLE_PAGE;
             $pagedef->parentmenu = $pageparentmenu[$pageindex];
             $pagedef->idnumber = 'pageidnumber' . ($pageindex + 1);
-            $pagedef->menusortorder = 0;
+            $pagedef->menusortorder = 50 + $pageindex;
             $this->create_page($usercontext, $pagedef, $rolesid,
                 array('pexels-simon-migaj-747964.jpg' => 'illustration.jpg'),
                 array('pexels-simon-migaj-747964.jpg' => 'image1.jpg'));
         }
         $this->setUser($this->manager);
-        $menu = new \local_mcms\menu\menu();
+        $menu = new \local_mcms\menu\menu(self::MENU_DEFINITION);
         $this->assertNotNull($menu);
-        $this->assertCount(1, $menu->get_children());
-        $this->assertEquals('pageidnumber1', $menu->get_children()[0]->get_uniqueid());
-        $this->assertEquals('pageidnumber2', $menu->get_children()[0]->get_uniqueid());
+        $this->assertCount(4, $menu->get_children());
+        $this->assertEquals('pageidnumber1', $menu->get_children()[3]->get_uniqueid()); // Page 1 should be at the end
+        // of the list.
+        $this->assertEquals('pageidnumber2', $menu->get_children()[1]->get_children()[0]->get_uniqueid());
+        // Page 2 should be under firstlevelfr as the first child.
 
     }
 

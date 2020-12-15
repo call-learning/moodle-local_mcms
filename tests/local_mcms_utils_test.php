@@ -33,7 +33,7 @@ require_once('lib.php');
  * @copyright 2020 - CALL Learning - Laurent David <laurent@call-learning.fr>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class local_mcms_utils_tests extends advanced_testcase {
+class local_mcms_utils_test extends advanced_testcase {
     use mcms_test_base;
 
     /**

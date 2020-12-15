@@ -119,7 +119,7 @@ class menu extends menu_item {
         $alluserrolessn = array_map(function($r) {
             return $r->shortname;
         }, $alluserroles);
-        $root = new menu();
+        $root = new menu_item('root');
         $lastitem = $root;
         $lastdepth = 0;
         $hiddenitems = array();
