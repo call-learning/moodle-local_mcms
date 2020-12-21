@@ -34,7 +34,7 @@ require_once('lib.php');
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class local_mcms_utils_test extends advanced_testcase {
-    use mcms_test_base;
+    use local_mcms_test_base;
 
     /**
      * Very basic test to see if function works
