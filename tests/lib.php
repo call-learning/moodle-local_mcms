@@ -81,8 +81,11 @@ trait mcms_test_base {
     /**
      * Create a simple page
      *
-     * @param $usercontext
-     * @param $pagedef
+     * @param \context_user $usercontext
+     * @param object $pagedef
+     * @param int $rolesid
+     * @param array $contentimages
+     * @param array $images
      * @return moodle_url
      * @throws \core\invalid_persistent_exception
      * @throws coding_exception

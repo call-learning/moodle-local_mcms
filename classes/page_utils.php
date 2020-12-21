@@ -123,7 +123,6 @@ class page_utils {
      * Helper for page adding ($data is form data)
      *
      * @param \stdClass $data
-     * @param \moodleform $mform
      * @param bool $isnewpage
      * @return moodle_url
      * @throws \coding_exception

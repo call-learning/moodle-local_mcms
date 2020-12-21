@@ -17,7 +17,7 @@
 /**
  * Basic Tests for LCMS pages
  *
- * @package   block_mcms
+ * @package   local_mcms
  * @copyright 2020 - CALL Learning - Laurent David <laurent@call-learning.fr>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -93,6 +93,9 @@ class local_mcms_basic_test extends advanced_testcase {
     }
     // @codingStandardsIgnoreStart
     // phpcs:disable
+    /**
+     * Sample page definition
+     */
     const SAMPLE_PAGE = array(
         'title' => 'Titre test',
         'shortname' => 'Titre Test',

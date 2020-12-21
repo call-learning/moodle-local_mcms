@@ -17,7 +17,7 @@
 /**
  * Basic Tests for LCMS pages
  *
- * @package   block_mcms
+ * @package   local_mcms
  * @copyright 2020 - CALL Learning - Laurent David <laurent@call-learning.fr>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -36,7 +36,14 @@ require_once('lib.php');
 class local_mcms_menu_test extends advanced_testcase {
     use mcms_test_base;
 
-    protected $manager = null, $student = null;
+    /**
+     * @var stdClass|null $manager
+     */
+    protected $manager = null;
+    /**
+     * @var stdClass|null $student
+     */
+    protected $student = null;
 
     /**
      * Test basic menu constructor
@@ -109,6 +116,9 @@ class local_mcms_menu_test extends advanced_testcase {
         $this->assertCount(0, $menu->get_children());
     }
 
+    /**
+     * Maximum number of pages to create for testing.
+     */
     const MAX_PAGE = 3;
 
     /**
@@ -237,6 +247,9 @@ class local_mcms_menu_test extends advanced_testcase {
 
     // @codingStandardsIgnoreStart
     // phpcs:disable
+    /**
+     * Sample page definition
+     */
     const SAMPLE_PAGE = array(
         'title' => 'Titre test',
         'shortname' => 'Titre Test',
@@ -252,6 +265,9 @@ class local_mcms_menu_test extends advanced_testcase {
         'usermodified' => '2',
     );
 
+    /**
+     * Sample menu defintion
+     */
     const MENU_DEFINITION = <<<EOF
 First level first item|firstlevel|http://www.moodle.com/
 -Second level first item|secondlevel|http://www.moodle.com/partners/|en
