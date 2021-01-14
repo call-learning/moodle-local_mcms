@@ -33,8 +33,6 @@ $pageid = optional_param('id', null, PARAM_INT);
 $pageidnumber = optional_param('p', null, PARAM_ALPHANUMEXT);
 $edit = optional_param('edit', null, PARAM_BOOL);    // Turn editing on and off.
 
-require_login();
-
 $page = null;
 if (!$pageid && $pageidnumber) {
     if (!$pageidnumber) {
@@ -49,12 +47,15 @@ if (!$pageid && $pageidnumber) {
 if (!$page) {
     print_error('nomatchingpage', 'local_mcms');
 }
-
 $context = context_system::instance();
 
-// Check user can view the page.
-$canviewpage = page::can_view_page($USER, $page, $context);
+$canviewpage = true;
+if (page::must_login($USER, $page)) {
+    require_login();
+    $canviewpage = page::can_view_page($USER, $page, $context);
+}
 
+// Check user can view the page.
 if (!$canviewpage) {
     print_error('cannotviewpage', 'local_mcms');
 }

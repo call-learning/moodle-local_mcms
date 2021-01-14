@@ -209,19 +209,44 @@ class page extends \core\persistent {
         if (has_capability('moodle/site:config', $context)) {
             return true; // Admin can see everything.
         }
+
+        $pageroles = $page->get_associated_roles();
+        // We can see the page without login in.
+        if ((empty($user->id) || isguestuser($user)) && empty($pageroles)) {
+            return true;
+        }
         $alluserroles = get_user_roles_with_special($context, $user->id);
         $alluserrolesid = array_map(function($r) {
             return $r->roleid;
         }, $alluserroles);
-        if (isguestuser($user) || empty($user->id)) {
+        if (isguestuser($user) || empty($user->id) ) {
             $guestrole = get_guest_role();
             $alluserrolesid[] = $guestrole->id; // Guest user has sometimes not the guest role !!
         }
-        $pageroles = $page->get_associated_roles();
         $pagesrolesid = array_map(function($r) {
             return $r->get('roleid');
         }, $pageroles);
         return !empty(array_intersect($pagesrolesid, $alluserrolesid));
+    }
+
+    /**
+     * Must we login to see the page ?
+     *
+     * @param \stdClass $user
+     * @param page $page
+     * @return bool
+     * @throws \coding_exception
+     */
+    public static function must_login($user, $page) {
+        if (empty($user) || empty($user->id)) {
+            $pageroles = $page->get_associated_roles();
+            if (empty($pageroles)) {
+                return true;
+            } else {
+                return false;
+            }
+
+        }
     }
 
 }
