@@ -49,4 +49,3 @@ class renderer extends plugin_renderer_base {
         return $pagelist->pagelist->out($pagelist->perpage, true);
     }
 }
-

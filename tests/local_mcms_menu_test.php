@@ -22,7 +22,7 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-use local_mcms\page_utils;
+use local_mcms\page;
 
 defined('MOODLE_INTERNAL') || die();
 require_once('lib.php');
@@ -192,6 +192,54 @@ class local_mcms_menu_test extends advanced_testcase {
         $this->assertEquals('pageidnumber1', $menu->get_children()[3]->get_uniqueid()); // Page 1 should be at the end
         // of the list.
         $this->assertEquals('pageidnumber2', $menu->get_children()[1]->get_children()[0]->get_uniqueid());
+        // Page 2 should be under firstlevelfr as the first child.
+
+    }
+
+    /**
+     * Test adding page in submenu (existing defined menu)
+     *
+     * @throws \core\invalid_persistent_exception
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws file_exception
+     * @throws moodle_exception
+     * @throws stored_file_creation_exception
+     */
+    public function test_page_in_submenu_parentid() {
+        global $DB;
+        $usercontext = context_user::instance($this->manager->id);
+        $this->setUser($this->manager);
+        $pageparentmenu = ['top', 'firstlevelfr', 'pageidnumber2'];
+        $pagedef = (object) self::SAMPLE_PAGE;
+        $pagedef->parent = 0;
+        $pagedef->parentmenu = 'top';
+        $pagedef->idnumber = 'page-top';
+        $pagedef->menusortorder = 1;
+        $rolesid = $DB->get_fieldset_select('role', 'id', 'shortname IN(\'guest\',\'manager\') ');
+        $this->create_page($usercontext, $pagedef, $rolesid,
+            array('pexels-simon-migaj-747964.jpg' => 'illustration.jpg'),
+            array('pexels-simon-migaj-747964.jpg' => 'image1.jpg'));
+        $parentpage = page::get_record(array('idnumber' => 'page-top'));
+        $rolesid = $DB->get_fieldset_select('role', 'id', 'shortname IN(\'guest\',\'manager\') ');
+        for ($pageindex = 0; $pageindex < self::MAX_PAGE; $pageindex++) {
+            $pagedef = (object) self::SAMPLE_PAGE;
+            $pagedef->parent = $parentpage->get('id');
+            $pagedef->idnumber = 'pageidnumber' . ($pageindex + 1);
+            $pagedef->menusortorder = 50 + $pageindex;
+            $this->create_page($usercontext, $pagedef, $rolesid,
+                array('pexels-simon-migaj-747964.jpg' => 'illustration.jpg'),
+                array('pexels-simon-migaj-747964.jpg' => 'image1.jpg'));
+        }
+        $this->setUser($this->manager);
+        $menu = new \local_mcms\menu\menu(self::MENU_DEFINITION);
+        $this->assertNotNull($menu);
+        $this->assertCount(4, $menu->get_children());
+        $this->assertEquals('page-top', $menu->get_children()[1]->get_uniqueid());
+        // Page top should be in the middle of the list.
+
+        $this->assertEquals('pageidnumber1', $menu->get_children()[1]->get_children()[0]->get_uniqueid()); // Page top should be in the middle
+        $this->assertEquals('pageidnumber2',  $menu->get_children()[1]->get_children()[1]->get_uniqueid());
         // Page 2 should be under firstlevelfr as the first child.
 
     }

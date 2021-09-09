@@ -76,3 +76,4 @@ class page_role extends \core\persistent {
         return $roles;
     }
 }
+

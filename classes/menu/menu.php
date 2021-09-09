@@ -221,6 +221,11 @@ class menu extends menu_item {
      */
     protected function add_page_in_menu(menu_item $item, page $p) {
         $parentmenu = $p->get('parentmenu');
+        if (empty($parentmenu)) {
+            $parentpageid = $p->get('parent');
+            $parentpage = page::get_record(array('id' => $parentpageid));
+            $parentmenu = $parentpage->get('idnumber');
+        }
         if ($item->get_uniqueid() == $parentmenu ||
             ($item->text == 'root' && $item->parent == null && $parentmenu == 'top')) {
             $item->add(

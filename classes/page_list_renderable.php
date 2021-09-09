@@ -119,4 +119,3 @@ class page_list_renderable implements renderable {
         $this->pagelist->out($this->perpage, false);
     }
 }
-
