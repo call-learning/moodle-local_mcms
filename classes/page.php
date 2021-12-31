@@ -70,11 +70,14 @@ class page extends \core\persistent {
      *
      * @param string $idnumber
      * @return static
-     * @throws \dml_exception
+     * @throws \moodle_exception
      */
     public static function get_record_by_idnumber($idnumber) {
         global $DB;
         $record = $DB->get_record(self::TABLE, array('idnumber' => $idnumber));
+        if(empty($record)) {
+            throw new \moodle_exception('pageoridnumbermssing', 'local_mcms');
+        }
         $persistents = new static(null, $record);
         return $persistents;
     }

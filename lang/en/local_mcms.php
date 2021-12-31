@@ -34,7 +34,7 @@ $string['mcms:managepages'] = 'Manage page';
 $string['mcmsgeneralsettings'] = 'General Settings';
 $string['pagemanagement'] = 'Mini CMS Page management';
 $string['page:list'] = 'List Pages';
-
+$string['pageoridnumbermssing'] = 'Page is missing, sorry!';
 // Filter labels.
 $string['pagefilter:idnumber'] = 'Unique Identifier (URL)';
 $string['pagefilter:rolename'] = 'Role Name';
