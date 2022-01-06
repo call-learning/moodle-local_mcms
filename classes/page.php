@@ -75,7 +75,7 @@ class page extends \core\persistent {
     public static function get_record_by_idnumber($idnumber) {
         global $DB;
         $record = $DB->get_record(self::TABLE, array('idnumber' => $idnumber));
-        if(empty($record)) {
+        if (empty($record)) {
             throw new \moodle_exception('pageoridnumbermssing', 'local_mcms');
         }
         $persistents = new static(null, $record);
@@ -89,46 +89,46 @@ class page extends \core\persistent {
      */
     protected static function define_properties() {
         return array(
-            'title' => array(
-                'type' => PARAM_TEXT,
-                'default' => ''
-            ),
-            'shortname' => array(
-                'type' => PARAM_TEXT,
-                'default' => ''
-            ),
-            'idnumber' => array(
-                'type' => PARAM_ALPHANUMEXT,
-                'default' => ''
-            ),
-            'description' => array(
-                'type' => PARAM_CLEANHTML,
-                'default' => ''
-            ),
-            'descriptionformat' => array(
-                'type' => PARAM_INT,
-                'default' => 1
-            ),
-            'parent' => array(
-                'type' => PARAM_INT,
-                'default' => 0
-            ),
-            'style' => array(
-                'type' => PARAM_ALPHANUMEXT,
-                'default' => ''
-            ),
-            'ctalink' => array(
-                'type' => PARAM_URL,
-                'default' => ''
-            ),
-            'parentmenu' => array(
-                'type' => PARAM_ALPHANUMEXT,
-                'default' => ''
-            ),
-            'menusortorder' => array(
-                'type' => PARAM_INT,
-                'default' => 0
-            ),
+                'title' => array(
+                        'type' => PARAM_TEXT,
+                        'default' => ''
+                ),
+                'shortname' => array(
+                        'type' => PARAM_TEXT,
+                        'default' => ''
+                ),
+                'idnumber' => array(
+                        'type' => PARAM_ALPHANUMEXT,
+                        'default' => ''
+                ),
+                'description' => array(
+                        'type' => PARAM_CLEANHTML,
+                        'default' => ''
+                ),
+                'descriptionformat' => array(
+                        'type' => PARAM_INT,
+                        'default' => 1
+                ),
+                'parent' => array(
+                        'type' => PARAM_INT,
+                        'default' => 0
+                ),
+                'style' => array(
+                        'type' => PARAM_ALPHANUMEXT,
+                        'default' => ''
+                ),
+                'ctalink' => array(
+                        'type' => PARAM_URL,
+                        'default' => ''
+                ),
+                'parentmenu' => array(
+                        'type' => PARAM_ALPHANUMEXT,
+                        'default' => ''
+                ),
+                'menusortorder' => array(
+                        'type' => PARAM_INT,
+                        'default' => 0
+                ),
         );
     }
 
@@ -222,7 +222,7 @@ class page extends \core\persistent {
         $alluserrolesid = array_map(function($r) {
             return $r->roleid;
         }, $alluserroles);
-        if (isguestuser($user) || empty($user->id) ) {
+        if (isguestuser($user) || empty($user->id)) {
             $guestrole = get_guest_role();
             $alluserrolesid[] = $guestrole->id; // Guest user has sometimes not the guest role !!
         }

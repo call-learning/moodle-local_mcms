@@ -91,8 +91,8 @@ class local_mcms_basic_test extends advanced_testcase {
         $this->assertFalse(page::can_view_page($studentuser, $page, $systemcontext));
         $this->assertFalse(page::can_view_page($guestuser, $page, $systemcontext));
     }
-    // @codingStandardsIgnoreStart
     // phpcs:disable
+    // @codingStandardsIgnoreStart
     /**
      * Sample page definition
      */
@@ -108,6 +108,7 @@ class local_mcms_basic_test extends advanced_testcase {
         'parentmenu' => 'none',
         'menusortorder' => '0'
     );
-    // phpcs:enable
     // @codingStandardsIgnoreEnd
+    // phpcs:enable
+
 }

@@ -54,7 +54,7 @@ class menu extends menu_item {
     /**
      * Creates the custom menu
      *
-     * @param string $definition the menu items definition in syntax required by {@link convert_text_to_menu_nodes()}
+     * @param string $definition the menu items definition in syntax required by convert_text_to_menu_nodes()
      * @param string $currentlanguage the current language code, null disables multilang support
      * @throws \coding_exception
      * @throws \dml_exception
@@ -191,6 +191,7 @@ class menu extends menu_item {
         foreach ($hiddenitems as $item) {
             $item->parent->remove_child($item);
         }
+
         return $root->get_children();
     }
 
@@ -221,18 +222,18 @@ class menu extends menu_item {
      */
     protected function add_page_in_menu(menu_item $item, page $p) {
         $parentmenu = $p->get('parentmenu');
-        if (empty($parentmenu)) {
+        if (empty($parentmenu) || $parentmenu == self::PAGE_MENU_NONE) {
             $parentpageid = $p->get('parent');
             $parentpage = page::get_record(array('id' => $parentpageid));
             $parentmenu = $parentpage->get('idnumber');
         }
         if ($item->get_uniqueid() == $parentmenu ||
-            ($item->text == 'root' && $item->parent == null && $parentmenu == 'top')) {
+                ($item->text == 'root' && $item->parent == null && $parentmenu == self::PAGE_MENU_TOP)) {
             $item->add(
-                $p->get('shortname') ? $p->get('shortname') : $p->get('title'),
-                $p->get('idnumber'),
-                $p->get_url(),
-                $p->get('menusortorder') ? $p->get('menusortorder') : null
+                    $p->get('shortname') ? $p->get('shortname') : $p->get('title'),
+                    $p->get('idnumber'),
+                    $p->get_url(),
+                    $p->get('menusortorder') ? $p->get('menusortorder') : null
             );
             // Then sort.
             $item->sort();
@@ -260,6 +261,7 @@ class menu extends menu_item {
         if ($itema == $itemb) {
             return 0;
         }
+
         return ($itema > $itemb) ? +1 : -1;
     }
 
@@ -277,16 +279,18 @@ class menu extends menu_item {
         if ($rootitem->get_uniqueid()) {
             $identifiableitems[$rootitem->get_uniqueid()] = $rootitem->get_text();
         }
+
         return $identifiableitems;
     }
 
     /**
      * Get all menus that can be identified
+     *
      * @return array
      * @throws \dml_exception
      */
     public static function get_all_identifiable_menus() {
-        $menuitems = ['none' => get_string('none'), 'top' => get_string('top')];
+        $menuitems = [self::PAGE_MENU_NONE => get_string('none'), self::PAGE_MENU_TOP => get_string('top')];
         $definition = get_config('local_mcms', 'rootmenuitems');
         if ($definition) {
             $menu = new menu($definition);
@@ -294,6 +298,17 @@ class menu extends menu_item {
                 $menuitems += $menu->get_identifiable_menu_items($item);
             }
         }
+
         return $menuitems;
     }
+
+    /**
+     * Not attached to existing menu at all. Deal only with page parent.
+     */
+    const PAGE_MENU_NONE = 'none';
+
+    /**
+     *  Attached to top menu.
+     */
+    const PAGE_MENU_TOP = 'top';
 }

@@ -118,7 +118,7 @@ class add_edit_form extends persistent {
 
         // This is to link the page to a top menu.
         $menus = menu::get_all_identifiable_menus();
-        $mform->addElement('select', 'parentmenu', get_string('page:parentmenu', 'local_mcms'), $menus, 'none');
+        $mform->addElement('select', 'parentmenu', get_string('page:parentmenu', 'local_mcms'), $menus, menu::PAGE_MENU_NONE);
         $mform->addHelpButton('parentmenu', 'page:parentmenu', 'local_mcms');
 
         $mform->addElement('text', 'menusortorder', get_string('page:menusortorder', 'local_mcms'));

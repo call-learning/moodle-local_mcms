@@ -83,7 +83,7 @@ trait local_mcms_test_base {
      *
      * @param \context_user $usercontext
      * @param object $pagedef
-     * @param int $rolesid
+     * @param int[] $rolesid
      * @param array $contentimages
      * @param array $images
      * @return moodle_url

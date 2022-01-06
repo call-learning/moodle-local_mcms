@@ -36,7 +36,7 @@ $edit = optional_param('edit', null, PARAM_BOOL);    // Turn editing on and off.
 $page = null;
 if (!$pageid && $pageidnumber) {
     if (!$pageidnumber) {
-        print_error('pageoridnumbermssing', 'local_mcms');
+        throw new moodle_exception('pageoridnumbermssing', 'local_mcms');
     }
     $page = page::get_record_by_idnumber($pageidnumber);
     $pageid = $page->get('id');
@@ -45,7 +45,7 @@ if (!$pageid && $pageidnumber) {
 }
 
 if (!$page) {
-    print_error('nomatchingpage', 'local_mcms');
+    throw new moodle_exception('nomatchingpage', 'local_mcms');
 }
 $context = context_system::instance();
 
@@ -57,7 +57,7 @@ if (page::must_login($USER, $page)) {
 
 // Check user can view the page.
 if (!$canviewpage) {
-    print_error('cannotviewpage', 'local_mcms');
+    throw new moodle_exception('cannotviewpage', 'local_mcms');
 }
 $pagetitle = $page->get('title');
 $header = "$SITE->shortname: $pagetitle";
