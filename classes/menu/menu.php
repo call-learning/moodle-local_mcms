@@ -224,8 +224,10 @@ class menu extends menu_item {
         $parentmenu = $p->get('parentmenu');
         if (empty($parentmenu) || $parentmenu == self::PAGE_MENU_NONE) {
             $parentpageid = $p->get('parent');
-            $parentpage = page::get_record(array('id' => $parentpageid));
-            $parentmenu = $parentpage->get('idnumber');
+            if (!empty($parentpageid) && ((int) $parentpageid) > 0) {
+                $parentpage = page::get_record(array('id' => $parentpageid));
+                $parentmenu = $parentpage->get('idnumber');
+            }
         }
         if ($item->get_uniqueid() == $parentmenu ||
                 ($item->text == 'root' && $item->parent == null && $parentmenu == self::PAGE_MENU_TOP)) {
