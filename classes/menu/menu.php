@@ -67,7 +67,44 @@ class menu extends menu_item {
         if (!empty($definition)) {
             $this->override_children(self::convert_text_to_menu_nodes($definition, $currentlanguage));
         }
+        $showadmin = $this->mcms_menu_show_site_administration();
+        if ($showadmin) {
+            $this->add(get_string('administrationsite'), 'administrationsite',
+                new \moodle_url('/admin/search.php'), 1000);
+            $this->sort();
+        }
         $this->add_pages_as_children();
+        $this->add_custom_menu();
+
+    }
+
+    /**
+     * Check if we should add the site administration node to the menu
+     */
+    public function mcms_menu_show_site_administration() {
+        global $PAGE;
+        $nodes = [];
+        foreach ($PAGE->primarynav->children as $node) {
+            if ($node->key == 'siteadminnode') {
+                return true;
+            }
+        }
+        return false;
+    }
+    /**
+     * Add moodle's custom menu items.
+     */
+    private function add_custom_menu() {
+        global $CFG;
+
+        if (empty($custommenuitems) && !empty($CFG->custommenuitems)) {
+            $custommenuitems = $CFG->custommenuitems;
+        }
+        $custommenu = new \custom_menu($custommenuitems, current_language());
+        $custommenuitems = $custommenu->get_children();
+        foreach ($custommenuitems as $item) {
+            $this->add($item->get_text(), '', $item->get_url(), 500);
+        }
     }
 
     /**
