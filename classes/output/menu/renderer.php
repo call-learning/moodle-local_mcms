@@ -69,6 +69,20 @@ class renderer extends plugin_renderer_base {
     }
 
     /**
+     * We want to show the custom menus as a list of links in the drawer for mobiles
+     * Just return the menu object exported so we can render it differently.
+     */
+    public function mcms_menu_menu_mobile() {
+        $definitions = get_config('local_mcms', 'rootmenuitems');
+        $mcmsmenu = new menu($definitions, current_language());
+        $menu = $mcmsmenu->export_for_template($this);
+        if (empty($menu->children)) {
+            return [];
+        }
+        return $menu->children;
+    }
+
+    /**
      * Renders a custom menu object for the MCMS plugin
      *
      * The custom menu this method produces makes use of the YUI3 menunav widget
@@ -81,12 +95,17 @@ class renderer extends plugin_renderer_base {
      */
     protected function render_menu(menu $menu) {
         $content = '';
+        $templatecontext = (object)[
+            'nodearray' => [],
+            'istablist' => false,
+            'navbarstyle' => 'navbar-nav'
+        ];
         foreach ($menu->get_children() as $item) {
             $context = $item->export_for_template($this);
-            $content .= $this->render_from_template('core/custom_menu_item', $context);
+            $templatecontext->nodearray[] = $context;
         }
 
-        return $content;
+        return $this->render_from_template('core/moremenu', $templatecontext);
     }
 
 }
