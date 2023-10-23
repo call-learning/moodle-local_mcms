@@ -25,21 +25,21 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
-$capabilities = array(
-    'local/mcms:managepages' => array(
+$capabilities = [
+    'local/mcms:managepages' => [
         'riskbitmask' => RISK_SPAM,
         'captype' => 'write',
         'contextlevel' => CONTEXT_SYSTEM,
-        'archetypes' => array(
-            'manager' => CAP_ALLOW
-        )
-    ),
-    'local/mcms:editpage' => array(
+        'archetypes' => [
+            'manager' => CAP_ALLOW,
+        ],
+    ],
+    'local/mcms:editpage' => [
         'riskbitmask' => RISK_SPAM,
         'captype' => 'write',
         'contextlevel' => CONTEXT_SYSTEM,
-        'archetypes' => array(
-            'manager' => CAP_ALLOW
-        )
-    )
-);
+        'archetypes' => [
+            'manager' => CAP_ALLOW,
+        ],
+    ],
+];

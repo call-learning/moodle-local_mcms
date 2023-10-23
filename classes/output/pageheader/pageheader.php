@@ -24,14 +24,11 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 namespace local_mcms\output\pageheader;
-
 use context_system;
 use local_mcms\page;
 use local_mcms\page_utils;
 use renderable;
 use stdClass;
-
-defined('MOODLE_INTERNAL') || die();
 
 /**
  * Page header

@@ -26,8 +26,6 @@
 
 namespace local_mcms;
 
-defined('MOODLE_INTERNAL') || die;
-
 use moodle_url;
 use pix_icon;
 use popup_action;
@@ -44,7 +42,7 @@ use table_sql;
 class page_list extends table_sql {
 
     /** @var array list of user fullname shown in report */
-    private $userfullnames = array();
+    private $userfullnames = [];
 
     /** @var stdClass filters parameters */
     private $filterparams;
@@ -63,9 +61,9 @@ class page_list extends table_sql {
         $this->set_attribute('class', 'generaltable generalbox table-sm');
         $this->filterparams = $filterparams;
         // Add course column if logs are displayed for site.
-        $cols = array();
-        $headers = array();
-        $this->define_columns(array_merge($cols, array('title',
+        $cols = [];
+        $headers = [];
+        $this->define_columns(array_merge($cols, ['title',
             'image',
             'shortname',
             'roles',
@@ -73,8 +71,8 @@ class page_list extends table_sql {
             'usermodified',
             'timecreated',
             'timemodified',
-            'actions')));
-        $this->define_headers(array_merge($headers, array(
+            'actions', ]));
+        $this->define_headers(array_merge($headers, [
                 get_string('page:title', 'local_mcms'),
                 get_string('page:image', 'local_mcms'),
                 get_string('page:shortname', 'local_mcms'),
@@ -83,8 +81,8 @@ class page_list extends table_sql {
                 get_string('page:usermodified', 'local_mcms'),
                 get_string('page:timecreated', 'local_mcms'),
                 get_string('page:timemodified', 'local_mcms'),
-                get_string('page:actions', 'local_mcms')
-            )
+                get_string('page:actions', 'local_mcms'),
+            ]
         ));
         $this->collapsible(false);
         $this->sortable(true);
@@ -156,7 +154,7 @@ class page_list extends table_sql {
         $imagesurls = page_utils::get_page_images_urls($page->id);
         $imageshtml = '';
         foreach ($imagesurls as $src) {
-            $imageshtml .= \html_writer::img($src, 'page-image', array('class' => 'img-thumbnail'));
+            $imageshtml .= \html_writer::img($src, 'page-image', ['class' => 'img-thumbnail']);
         }
         return $imageshtml;
     }
@@ -183,7 +181,7 @@ class page_list extends table_sql {
 
         $associatedroles = page::get_page_roles($page->id);
         foreach ($associatedroles as $r) {
-            $role = $DB->get_record('role', array('id' => $r->get('roleid')));
+            $role = $DB->get_record('role', ['id' => $r->get('roleid')]);
             $roleshtml .= \html_writer::div(role_get_name($role), 'badge badge-primary');
         }
         return $roleshtml;
@@ -262,12 +260,12 @@ class page_list extends table_sql {
             ],
             'view' => (object) [
                 'icon' => 'e/search',
-                'url' => new moodle_url('/local/mcms/index.php', ['id' => $row->id])
+                'url' => new moodle_url('/local/mcms/index.php', ['id' => $row->id]),
             ],
             'delete' => (object) [
                 'icon' => 't/delete',
-                'url' => new moodle_url($baseurl . '/delete.php', ['id' => $row->id])
-            ]
+                'url' => new moodle_url($baseurl . '/delete.php', ['id' => $row->id]),
+            ],
         ];
         foreach ($actionsdef as $k => $a) {
             $popupaction = empty($a->popup) ? null :
@@ -307,8 +305,8 @@ class page_list extends table_sql {
     public function query_db($pagesize, $useinitialsbar = true) {
         global $DB;
 
-        $joins = array('1=1');
-        $params = array();
+        $joins = ['1=1'];
+        $params = [];
 
         $orderby = 'title ASC';
         if ($this->filterparams) {

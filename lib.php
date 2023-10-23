@@ -27,8 +27,6 @@
 use local_mcms\page;
 use local_mcms\page_utils;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Retrieve file for a specific page
  *
@@ -44,7 +42,7 @@ defined('MOODLE_INTERNAL') || die();
  * @throws moodle_exception
  * @throws require_login_exception
  */
-function local_mcms_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload, array $options = array()) {
+function local_mcms_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload, array $options = []) {
     global $USER;
     // Check the contextlevel is as expected - if your plugin is a block, this becomes CONTEXT_BLOCK, etc.
     if ($context->contextlevel != CONTEXT_SYSTEM) {
@@ -53,7 +51,7 @@ function local_mcms_pluginfile($course, $cm, $context, $filearea, $args, $forced
 
     // Make sure the filearea is one of those used by the plugin.
     if (!in_array($filearea,
-        array(page_utils::PLUGIN_FILE_AREA_IMAGE, page_utils::PLUGIN_FILE_AREA_DESCRIPTION))) {
+        [page_utils::PLUGIN_FILE_AREA_IMAGE, page_utils::PLUGIN_FILE_AREA_DESCRIPTION])) {
         send_file_not_found();
     }
 

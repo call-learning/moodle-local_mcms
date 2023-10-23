@@ -86,7 +86,7 @@ $pagedata = $page->to_record();
 $pagedata->description = [
     'text' => $currendescription,
     'format' => $page->get('descriptionformat'),
-    'itemid' => $draftideditor
+    'itemid' => $draftideditor,
 ];
 $mform->set_data($pagedata);
 

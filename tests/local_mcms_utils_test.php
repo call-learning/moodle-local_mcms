@@ -21,8 +21,9 @@
  * @copyright 2020 - CALL Learning - Laurent David <laurent@call-learning.fr>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-use local_mcms\page_utils;
+namespace local_mcms;
+use advanced_testcase;
+use local_mcms_test_base;
 
 defined('MOODLE_INTERNAL') || die();
 require_once('lib.php');
@@ -39,7 +40,7 @@ class local_mcms_utils_test extends advanced_testcase {
     /**
      * Very basic test to see if function works
      *
-     * @throws coding_exception
+     * @covers \page_utils::get_template_styles_for_mcms
      */
     public function test_get_mcms_templates() {
         $templates = page_utils::get_template_styles_for_mcms();

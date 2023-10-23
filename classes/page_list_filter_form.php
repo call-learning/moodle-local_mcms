@@ -45,7 +45,7 @@ class page_list_filter_form extends \moodleform {
      * @throws \coding_exception
      */
     public static function get_filter_definition() {
-        return array(
+        return [
             'shortname' => (object) ['type' => PARAM_TEXT, 'default' => ''],
             'title' => (object) ['type' => PARAM_TEXT, 'default' => ''],
             'idnumber' => (object) ['type' => PARAM_TEXT, 'default' => ''],
@@ -56,10 +56,10 @@ class page_list_filter_form extends \moodleform {
                     'title ASC' => get_string('pagefilter:title:asc', 'local_mcms'),
                     'title DESC' => get_string('pagefilter:title:desc', 'local_mcms'),
                     'timemodified ASC' => get_string('pagefilter:timemodified:asc', 'local_mcms'),
-                    'timemodified DESC' => get_string('pagefilter:timemodified:desc', 'local_mcms')
+                    'timemodified DESC' => get_string('pagefilter:timemodified:desc', 'local_mcms'),
                 ],
-                'default' => 'title ASC'],
-        );
+                'default' => 'title ASC', ],
+        ];
     }
 
     /**
@@ -88,7 +88,7 @@ class page_list_filter_form extends \moodleform {
         $buttonarray[] = &$mform->createElement('submit', 'search',
             get_string('search'));
         $buttonarray[] = $mform->createElement('reset', 'clear', get_string('clear'));
-        $mform->addGroup($buttonarray, 'buttonar', '', array(' '), false);
+        $mform->addGroup($buttonarray, 'buttonar', '', [' '], false);
         $mform->closeHeaderBefore('buttonar');
     }
 }

@@ -22,9 +22,14 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-use core\invalid_persistent_exception;
+namespace local_mcms;
+
+use advanced_testcase;
+use context_system;
+use context_user;
 use local_mcms\menu\menu;
-use local_mcms\page;
+use local_mcms_test_base;
+use stdClass;
 
 defined('MOODLE_INTERNAL') || die();
 require_once('lib.php');
@@ -45,24 +50,24 @@ class local_mcms_menu_test extends advanced_testcase {
     /**
      * Sample page definition
      */
-    const SAMPLE_PAGE = array(
-            'title' => 'Titre test',
-            'shortname' => 'Titre Test',
-            'idnumber' => 'pageidnumber1',
-            'description' => '<p dir="ltr" style="text-align: left;">
+    const SAMPLE_PAGE = [
+        'title' => 'Titre test',
+        'shortname' => 'Titre Test',
+        'idnumber' => 'pageidnumber1',
+        'description' => '<p dir="ltr" style="text-align: left;">
             <img src="@@PLUGINFILE@@/pexels-ella-olsson-1640777%20%284%29.jpg" alt="" width="1280" height="853" role="presentation"
              class="img-responsive atto_image_button_text-bottom"><br></p><p dir="ltr" style="text-align: left;"><br></p><p
              dir="ltr" style="text-align: left;">dfqsfgdqsggsq</p><p dir="ltr" style="text-align: left;"><br></p><p dir="ltr"
                           style="text-align: left;">Test</p>',
-            'descriptionformat' => '1',
-            'parent' => '0',
-            'style' => 'default',
-            'ctalink' => '/course/index.php',
-            'menusortorder' => '-1',
-            'timecreated' => '1606753532',
-            'timemodified' => '1606758229',
-            'usermodified' => '2',
-    );
+        'descriptionformat' => '1',
+        'parent' => '0',
+        'style' => 'default',
+        'ctalink' => '/course/index.php',
+        'menusortorder' => '-1',
+        'timecreated' => '1606753532',
+        'timemodified' => '1606758229',
+        'usermodified' => '2',
+    ];
     /**
      * Sample menu defintion
      */
@@ -86,6 +91,8 @@ EOF;
 
     /**
      * Test basic menu constructor
+     *
+     * @covers \local_mcms\menu\menu::__construct
      */
     public function test_menu_without_pages() {
         $menu = new menu();
@@ -96,6 +103,8 @@ EOF;
 
     /**
      * Test that menu can be imported by definition
+     *
+     * @covers \local_mcms\menu\menu::__construct
      */
     public function test_menu_with_definition() {
         $menu = new menu(self::MENU_DEFINITION);
@@ -105,8 +114,8 @@ EOF;
         $this->assertEquals('Second level first item', $menu->get_children()[0]->get_children()[0]->get_text());
         $this->assertEquals('First level first item', $menu->get_children()[0]->get_text());
         $this->assertEquals(
-                'http://www.moodle.com/partners/',
-                $menu->get_children()[0]->get_children()[0]->get_url()->out()
+            'http://www.moodle.com/partners/',
+            $menu->get_children()[0]->get_children()[0]->get_url()->out()
         );
         $this->assertEquals('http://www.moodle.com/', $menu->get_children()[0]->get_url()->out());
 
@@ -114,6 +123,8 @@ EOF;
 
     /**
      * Test that menu in another language are ignored
+     *
+     * @covers \local_mcms\menu\menu::__construct
      */
     public function test_menu_with_definition_language() {
         $menu = new menu(self::MENU_DEFINITION, 'fr');
@@ -127,15 +138,11 @@ EOF;
     /**
      * Test adding page in menu
      *
-     * @throws invalid_persistent_exception
-     * @throws coding_exception
-     * @throws dml_exception
-     * @throws file_exception
-     * @throws moodle_exception
-     * @throws stored_file_creation_exception
+     * @covers \page::create_page
+     * @covers \local_mcms\menu\menu::get_children
      */
-    public function test_menu_with_page() {
-        global $DB, $PAGE;
+    public function test_menu_with_page_as_manager() {
+        global $DB;
         $usercontext = context_user::instance($this->manager->id);
         $this->setUser($this->manager);
 
@@ -143,19 +150,42 @@ EOF;
         $pagedef->parentmenu = menu::PAGE_MENU_TOP;
         $rolesid = $DB->get_fieldset_select('role', 'id', 'shortname IN(\'guest\',\'manager\') ');
         $this->create_page(
-                $usercontext,
-                $pagedef,
-                $rolesid,
-                array('pexels-simon-migaj-747964.jpg' => 'illustration.jpg'),
-                array('pexels-simon-migaj-747964.jpg' => 'image1.jpg')
+            $usercontext,
+            $pagedef,
+            $rolesid,
+            ['pexels-simon-migaj-747964.jpg' => 'illustration.jpg'],
+            ['pexels-simon-migaj-747964.jpg' => 'image1.jpg']
         );
 
         $this->setUser($this->manager);
         $menu = new menu();
         $this->assertNotNull($menu);
-        $this->assertCount(1, $menu->get_children());
+        // Site Administration menu has been added automatically.
+        $this->assertCount(2, $menu->get_children());
         $this->assertEquals('pageidnumber1', $menu->get_children()[0]->get_uniqueid());
+    }
 
+    /**
+     * Test adding page in menu
+     *
+     * @covers \page::create_page
+     * @covers \local_mcms\menu\menu::get_children
+     */
+    public function test_menu_with_page_as_user() {
+        global $DB;
+        $usercontext = context_user::instance($this->manager->id);
+        $this->setUser($this->manager);
+
+        $pagedef = (object) self::SAMPLE_PAGE;
+        $pagedef->parentmenu = menu::PAGE_MENU_TOP;
+        $rolesid = $DB->get_fieldset_select('role', 'id', 'shortname IN(\'guest\',\'manager\') ');
+        $this->create_page(
+            $usercontext,
+            $pagedef,
+            $rolesid,
+            ['pexels-simon-migaj-747964.jpg' => 'illustration.jpg'],
+            ['pexels-simon-migaj-747964.jpg' => 'image1.jpg']
+        );
         $this->setUser($this->student);
         $menu = new menu();
         $this->assertNotNull($menu);
@@ -165,12 +195,7 @@ EOF;
     /**
      * Test sortorder when different from insertion order
      *
-     * @throws invalid_persistent_exception
-     * @throws coding_exception
-     * @throws dml_exception
-     * @throws file_exception
-     * @throws moodle_exception
-     * @throws stored_file_creation_exception
+     * @covers \local_mcms\menu\menu::get_children
      */
     public function test_menu_with_page_sortorder() {
         global $DB;
@@ -185,35 +210,35 @@ EOF;
             $pagedef->idnumber = 'pageidnumber' . ($pageindex + 1);
             $pagedef->menusortorder = $pagemenusortorder[$pageindex];
             $this->create_page(
-                    $usercontext,
-                    $pagedef,
-                    $rolesid,
-                    array('pexels-simon-migaj-747964.jpg' => 'illustration.jpg'),
-                    array('pexels-simon-migaj-747964.jpg' => 'image1.jpg')
+                $usercontext,
+                $pagedef,
+                $rolesid,
+                ['pexels-simon-migaj-747964.jpg' => 'illustration.jpg'],
+                ['pexels-simon-migaj-747964.jpg' => 'image1.jpg']
             );
         }
         $this->setUser($this->manager);
         $menu = new menu();
         $this->assertNotNull($menu);
-        $this->assertCount(3, $menu->get_children());
-        $this->assertEquals('pageidnumber2', $menu->get_children()[0]->get_uniqueid());
-        // Page 2 was inserted after but should appear first.
-        $this->assertEquals('pageidnumber1', $menu->get_children()[1]->get_uniqueid());
-        // Page 2 was inserted first but should appear second.
-        $this->assertEquals('pageidnumber3', $menu->get_children()[2]->get_uniqueid());
-        // Page 3 was inserted last and appear last as the sort order was null.
-
+        // Site Administration menu has been added automatically.
+        $this->assertCount(4, $menu->get_children());
+        $uniqueids = array_map(function ($item) {
+            return $item->get_uniqueid();
+        }, $menu->get_children());
+        $this->assertEquals([
+            'pageidnumber2', // Page 2 was inserted after but should appear first.
+            'pageidnumber1', // Page 2 was inserted first but should appear second.
+            'pageidnumber3', // Page 3 was inserted last and appear last as the sort order was null.
+            'administrationsite', // Last is site administration.
+        ],
+            array_values($uniqueids)
+        );
     }
 
     /**
      * Test adding page in submenu (existing defined menu)
      *
-     * @throws invalid_persistent_exception
-     * @throws coding_exception
-     * @throws dml_exception
-     * @throws file_exception
-     * @throws moodle_exception
-     * @throws stored_file_creation_exception
+     * @covers \local_mcms\menu\menu::get_children
      */
     public function test_page_in_submenu() {
         global $DB;
@@ -227,17 +252,18 @@ EOF;
             $pagedef->idnumber = 'pageidnumber' . ($pageindex + 1);
             $pagedef->menusortorder = 50 + $pageindex;
             $this->create_page(
-                    $usercontext,
-                    $pagedef,
-                    $rolesid,
-                    array('pexels-simon-migaj-747964.jpg' => 'illustration.jpg'),
-                    array('pexels-simon-migaj-747964.jpg' => 'image1.jpg')
+                $usercontext,
+                $pagedef,
+                $rolesid,
+                ['pexels-simon-migaj-747964.jpg' => 'illustration.jpg'],
+                ['pexels-simon-migaj-747964.jpg' => 'image1.jpg']
             );
         }
         $this->setUser($this->manager);
         $menu = new menu(self::MENU_DEFINITION);
         $this->assertNotNull($menu);
-        $this->assertCount(4, $menu->get_children());
+        // Site Administration menu has been added automatically.
+        $this->assertCount(5, $menu->get_children());
         $this->assertEquals('pageidnumber1', $menu->get_children()[3]->get_uniqueid());
         // Page 1 should be at the end of the list.
         $this->assertEquals('pageidnumber2', $menu->get_children()[1]->get_children()[0]->get_uniqueid());
@@ -248,12 +274,7 @@ EOF;
     /**
      * Test adding page in submenu (existing defined menu)
      *
-     * @throws invalid_persistent_exception
-     * @throws coding_exception
-     * @throws dml_exception
-     * @throws file_exception
-     * @throws moodle_exception
-     * @throws stored_file_creation_exception
+     * @covers \local_mcms\menu\menu::get_children
      */
     public function test_page_in_submenu_parentid() {
         global $DB;
@@ -267,13 +288,13 @@ EOF;
         $pagedef->menusortorder = 1;
         $rolesid = $DB->get_fieldset_select('role', 'id', 'shortname IN(\'guest\',\'manager\') ');
         $this->create_page(
-                $usercontext,
-                $pagedef,
-                $rolesid,
-                array('pexels-simon-migaj-747964.jpg' => 'illustration.jpg'),
-                array('pexels-simon-migaj-747964.jpg' => 'image1.jpg')
+            $usercontext,
+            $pagedef,
+            $rolesid,
+            ['pexels-simon-migaj-747964.jpg' => 'illustration.jpg'],
+            ['pexels-simon-migaj-747964.jpg' => 'image1.jpg']
         );
-        $parentpage = page::get_record(array('idnumber' => 'page-top'));
+        $parentpage = page::get_record(['idnumber' => 'page-top']);
         $rolesid = $DB->get_fieldset_select('role', 'id', 'shortname IN(\'guest\',\'manager\') ');
         for ($pageindex = 0; $pageindex < self::MAX_PAGE; $pageindex++) {
             $pagedef = (object) self::SAMPLE_PAGE;
@@ -281,22 +302,23 @@ EOF;
             $pagedef->idnumber = 'pageidnumber' . ($pageindex + 1);
             $pagedef->menusortorder = 50 + $pageindex;
             $this->create_page(
-                    $usercontext,
-                    $pagedef,
-                    $rolesid,
-                    array('pexels-simon-migaj-747964.jpg' => 'illustration.jpg'),
-                    array('pexels-simon-migaj-747964.jpg' => 'image1.jpg')
+                $usercontext,
+                $pagedef,
+                $rolesid,
+                ['pexels-simon-migaj-747964.jpg' => 'illustration.jpg'],
+                ['pexels-simon-migaj-747964.jpg' => 'image1.jpg']
             );
         }
         $this->setUser($this->manager);
         $menu = new menu(self::MENU_DEFINITION);
         $this->assertNotNull($menu);
-        $this->assertCount(4, $menu->get_children());
+        // Site Administration menu has been added automatically.
+        $this->assertCount(5, $menu->get_children());
         $this->assertEquals('page-top', $menu->get_children()[1]->get_uniqueid());
         // Page top should be in the middle of the list.
         $this->assertEquals(
-                'pageidnumber1',
-                $menu->get_children()[1]->get_children()[0]->get_uniqueid()
+            'pageidnumber1',
+            $menu->get_children()[1]->get_children()[0]->get_uniqueid()
         ); // Page top should be in the middle.
         $this->assertEquals('pageidnumber2', $menu->get_children()[1]->get_children()[1]->get_uniqueid());
         // Page 2 should be under firstlevelfr as the first child.
@@ -306,12 +328,7 @@ EOF;
     /**
      * Get page in submenu
      *
-     * @throws invalid_persistent_exception
-     * @throws coding_exception
-     * @throws dml_exception
-     * @throws file_exception
-     * @throws moodle_exception
-     * @throws stored_file_creation_exception
+     * @covers \local_mcms\menu\menu::get_children
      */
     public function test_page_in_submenu_with_defined_menu() {
         global $DB;
@@ -324,35 +341,28 @@ EOF;
         $pagedef->menusortorder = 2;
         $rolesid = $DB->get_fieldset_select('role', 'id', 'shortname IN(\'guest\',\'manager\') ');
         $this->create_page(
-                $usercontext,
-                $pagedef,
-                $rolesid,
-                array('pexels-simon-migaj-747964.jpg' => 'illustration.jpg'),
-                array('pexels-simon-migaj-747964.jpg' => 'image1.jpg')
+            $usercontext,
+            $pagedef,
+            $rolesid,
+            ['pexels-simon-migaj-747964.jpg' => 'illustration.jpg'],
+            ['pexels-simon-migaj-747964.jpg' => 'image1.jpg']
         );
 
         $this->setUser($this->manager);
         $menu = new menu(self::MENU_DEFINITION);
         $this->assertNotNull($menu);
-        $this->assertCount(3, $menu->get_children());
+        // Site Administration menu has been added automatically.
+        $this->assertCount(4, $menu->get_children());
         $this->assertEquals(
-                'pageidnumber1',
-                $menu->get_children()[0]->get_children()[0]->get_children()[0]->get_uniqueid()
+            'pageidnumber1',
+            $menu->get_children()[0]->get_children()[0]->get_children()[0]->get_uniqueid()
         );
     }
-
-    // @codingStandardsIgnoreStart
-    // phpcs:disable
 
     /**
      * Get page in submenu of a parent page
      *
-     * @throws invalid_persistent_exception
-     * @throws coding_exception
-     * @throws dml_exception
-     * @throws file_exception
-     * @throws moodle_exception
-     * @throws stored_file_creation_exception
+     * @covers \local_mcms\menu\menu::get_children
      */
     public function test_children_of_another_page() {
         global $DB;
@@ -363,11 +373,11 @@ EOF;
         $pagedef->parentmenu = menu::PAGE_MENU_TOP;
         $rolesid = $DB->get_fieldset_select('role', 'id', 'shortname IN(\'guest\',\'manager\') ');
         $this->create_page(
-                $usercontext,
-                $pagedef,
-                $rolesid,
-                array('pexels-simon-migaj-747964.jpg' => 'illustration.jpg'),
-                array('pexels-simon-migaj-747964.jpg' => 'image1.jpg')
+            $usercontext,
+            $pagedef,
+            $rolesid,
+            ['pexels-simon-migaj-747964.jpg' => 'illustration.jpg'],
+            ['pexels-simon-migaj-747964.jpg' => 'image1.jpg']
         );
 
         $pagedef = (object) self::SAMPLE_PAGE;
@@ -376,35 +386,37 @@ EOF;
         $pagedef->parentmenu = 'none';
         $pagedef->idnumber = 'pageidnumber2';
         $this->create_page(
-                $usercontext,
-                $pagedef,
-                $rolesid,
-                array('pexels-simon-migaj-747964.jpg' => 'illustration.jpg'),
-                array('pexels-simon-migaj-747964.jpg' => 'image1.jpg')
+            $usercontext,
+            $pagedef,
+            $rolesid,
+            ['pexels-simon-migaj-747964.jpg' => 'illustration.jpg'],
+            ['pexels-simon-migaj-747964.jpg' => 'image1.jpg']
         );
 
         $this->setUser($this->manager);
         $menu = new menu(self::MENU_DEFINITION);
         $this->assertNotNull($menu);
-        $this->assertCount(4, $menu->get_children());
+        // Site Administration menu has been added automatically.
+        $this->assertCount(5, $menu->get_children());
         $this->assertEquals(
-                'pageidnumber1',
-                $menu->get_children()[0]->get_uniqueid()
+            'pageidnumber1',
+            $menu->get_children()[0]->get_uniqueid()
         );
         $this->assertEquals(
-                'pageidnumber2',
-                $menu->get_children()[0]->get_children()[0]->get_uniqueid()
+            'pageidnumber2',
+            $menu->get_children()[0]->get_children()[0]->get_uniqueid()
         );
     }
 
     /**
      * Setup
      *
-     * @throws coding_exception
-     * @throws dml_exception
      */
-    public function setUp() {
+    public function setUp(): void {
         global $DB;
+        global $PAGE;
+        $PAGE->set_context(context_system::instance());
+        $PAGE->set_url(new \moodle_url('/'));
         $this->resetAfterTest();
         $rolessnid = $DB->get_records_menu('role', null, $sort = '', $fields = 'shortname,id');
 
@@ -414,6 +426,4 @@ EOF;
         role_assign($rolessnid['manager'], $this->manager->id, $systemcontext->id);
         role_assign($rolessnid['student'], $this->student->id, $systemcontext->id);
     }
-    // phpcs:enable
-    // @codingStandardsIgnoreEnd
 }

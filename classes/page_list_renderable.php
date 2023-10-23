@@ -29,8 +29,6 @@ namespace local_mcms;
 use moodle_url;
 use renderable;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Moodle Mini CMS utility.
  *
@@ -107,7 +105,7 @@ class page_list_renderable implements renderable {
         $this->pagelist = new page_list('page_list', $this->filter);
         $this->pagelist->define_baseurl($this->url);
         $this->pagelist->is_downloadable(true);
-        $this->pagelist->show_download_buttons_at(array(TABLE_P_BOTTOM));
+        $this->pagelist->show_download_buttons_at([TABLE_P_BOTTOM]);
     }
 
     /**

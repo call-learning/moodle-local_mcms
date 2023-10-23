@@ -24,8 +24,6 @@
 
 use local_mcms\page_utils;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Base class for MCMS local tests
  *
@@ -53,14 +51,14 @@ trait local_mcms_test_base {
             if (!empty($destfilenames[$index])) {
                 $destfilename = $destfilenames[$index];
             }
-            $filerecord = array(
+            $filerecord = [
                 'contextid' => $usercontext->id,
                 'component' => 'user',
                 'filearea' => 'draft',
                 'itemid' => $draftitemid,
                 'filepath' => '/',
                 'filename' => $destfilename,
-            );
+            ];
             // Create an area to upload the file.
             $fs = get_file_storage();
             // Create a file from the string that we made earlier.

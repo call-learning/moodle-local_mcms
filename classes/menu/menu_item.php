@@ -23,16 +23,12 @@
  * @copyright 2020 - CALL Learning - Laurent David <laurent@call-learning.fr>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 namespace local_mcms\menu;
-
 use context_system;
 use moodle_url;
 use renderable;
 use renderer_base;
 use templatable;
-
-defined('MOODLE_INTERNAL') || die();
 
 /**
  * Mini CMS menu item
@@ -76,12 +72,12 @@ class menu_item implements renderable, templatable {
     /**
      * @var array A array in which to store children this item has.
      */
-    protected $children = array();
+    protected $children = [];
 
     /**
-     * @var int A reference to the sort var of the last child that was added
+     * @var int A reference to the highest sort value so far.
      */
-    protected $lastsort = 0;
+    protected $highestsort = 0;
 
     /**
      * Constructs the new custom menu item
@@ -114,10 +110,10 @@ class menu_item implements renderable, templatable {
     public function add($text, $uniqueid = null, moodle_url $url = null, $sort = null) {
         $key = count($this->children);
         if (empty($sort)) {
-            $sort = $this->lastsort + 1;
+            $sort = $this->highestsort + 1;
         }
         $this->children[$key] = new menu_item($text, $uniqueid, $url, $sort, $this);
-        $this->lastsort = (int) $sort;
+        $this->highestsort = max((int) $sort, $this->highestsort);
         return $this->children[$key];
     }
 
@@ -204,7 +200,7 @@ class menu_item implements renderable, templatable {
      * Sorts the children this item has
      */
     public function sort() {
-        usort($this->children, array('local_mcms\\menu\\menu', 'sort_custom_menu_items'));
+        usort($this->children, ['local_mcms\\menu\\menu', 'sort_custom_menu_items']);
     }
 
     /**
@@ -262,7 +258,7 @@ class menu_item implements renderable, templatable {
         $context->url = $this->url ? $this->url->out() : null;
         $context->title = external_format_string($this->text, $syscontext->id);
         $context->sort = $this->sort;
-        $context->children = array();
+        $context->children = [];
         if (preg_match("/^#+$/", $this->text)) {
             $context->divider = true;
         }

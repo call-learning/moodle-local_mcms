@@ -51,11 +51,11 @@ class add_edit_form extends persistent {
     protected static $persistentclass = '\\local_mcms\\page';
 
     /** @var array Fields to remove when getting the final data. */
-    protected static $fieldstoremove = array('submitbutton');
+    protected static $fieldstoremove = ['submitbutton'];
     /**
      * @var string[] Fields to remove when validating data.
      */
-    protected static $foreignfields = array('pageroles', 'image_filemanager', 'descriptiontrust');
+    protected static $foreignfields = ['pageroles', 'image_filemanager', 'descriptiontrust'];
 
     /**
      * The form definition.
@@ -112,7 +112,7 @@ class add_edit_form extends persistent {
             'pageroles',
             get_string('page:roles', 'local_mcms'),
             $roles,
-            array('multiple' => true));
+            ['multiple' => true]);
         $mform->setType('pageroles', PARAM_RAW);
         $mform->addHelpButton('pageroles', 'page:roles', 'local_mcms');
 
@@ -136,13 +136,13 @@ class add_edit_form extends persistent {
      */
     public static function get_images_options() {
         global $CFG;
-        return array(
+        return [
             'maxfiles' => 1,
             'maxbytes' => $CFG->maxbytes,
             'subdirs' => 0,
             'accepted_types' => 'web_image',
-            'context' => context_system::instance()
-        );
+            'context' => context_system::instance(),
+        ];
     }
 
     /**
@@ -173,12 +173,12 @@ class add_edit_form extends persistent {
      * @return array
      */
     public static function get_description_editor_options() {
-        return array(
+        return [
             'trusttext' => false,
             'noclean' => true,
             'subdirs' => true,
             'maxfiles' => EDITOR_UNLIMITED_FILES,
             'maxbytes' => FILE_AREA_MAX_BYTES_UNLIMITED,
-            'context' => context_system::instance());
+            'context' => context_system::instance(), ];
     }
 }

@@ -25,7 +25,7 @@
  */
 
 use local_mcms\page;
-
+// phpcs:ignore moodle.Files.RequireLogin.Missing
 require_once(__DIR__ . '/../../config.php');
 global $SITE, $CFG, $PAGE, $USER, $OUTPUT;
 
@@ -64,7 +64,7 @@ $header = "$SITE->shortname: $pagetitle";
 $PAGE->set_blocks_editing_capability('local/mcms:editpage');
 
 // Start setting up the page.
-$params = array('id' => $pageid);
+$params = ['id' => $pageid];
 $PAGE->set_context($context);
 $PAGE->set_url('/local/mcms/index.php', $params);
 $layout = "standard";
@@ -123,6 +123,6 @@ echo $renderer->custom_block_region('content');
 echo $renderer->footer();
 
 // Trigger the page has been viewed event.
-$eventparams = array('context' => $context, 'objectid' => $pageid);
+$eventparams = ['context' => $context, 'objectid' => $pageid];
 $event = local_mcms\event\page_viewed::create($eventparams);
 $event->trigger();

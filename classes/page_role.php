@@ -23,10 +23,7 @@
  * @copyright 2020 - CALL Learning - Laurent David <laurent@call-learning.fr>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 namespace local_mcms;
-
-defined('MOODLE_INTERNAL') || die();
 
 /**
  * Class page
@@ -47,16 +44,16 @@ class page_role extends \core\persistent {
      * @return array|array[]
      */
     protected static function define_properties() {
-        return array(
-            'pageid' => array(
+        return [
+            'pageid' => [
                 'type' => PARAM_INT,
-                'default' => ''
-            ),
-            'roleid' => array(
+                'default' => '',
+            ],
+            'roleid' => [
                 'type' => PARAM_INT,
-                'default' => ''
-            ),
-        );
+                'default' => '',
+            ],
+        ];
     }
 
     /**

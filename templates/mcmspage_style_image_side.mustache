@@ -15,7 +15,16 @@
     along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 }}
 {{!
-    Default page header.
+    @template local_mcms/mcmspage_style_image_side
+
+    Style for page header with image on the side.
+
+    Example context (json):
+    {
+        "title": "Page title",
+        "descriptionhtml": "<p>Page description</p>",
+        "imagesurl": ["https://moodle.org/logo/moodle-logo.svg"]
+    }
 }}
 <div class="mcms-header-container text-dark page-style-image-side">
     <div class="container">
@@ -25,7 +34,7 @@
                 {{{descriptionhtml}}}
             </div>
             {{#imagesurl}}
-                <img src="{{ . }}" class="side-image img-fluid p-3 d-none d-sm-flex"/>
+                <img src="{{ . }}" class="side-image img-fluid p-3 d-none d-sm-flex" alt="">
             {{/imagesurl}}
         </div>
     </div>

@@ -31,8 +31,6 @@ use local_mcms\event\page_updated;
 use local_mcms\form\add_edit_form;
 use moodle_url;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Class page
  *
@@ -168,16 +166,16 @@ class page_utils {
             $page->get('id'));
 
         if ($isnewpage) {
-            $eventparams = array('objectid' => $page->get('id'), 'context' => context_system::instance());
+            $eventparams = ['objectid' => $page->get('id'), 'context' => context_system::instance()];
             $event = page_added::create($eventparams);
             $event->trigger();
         } else {
             $action = get_string('pageinfoupdated', 'local_mcms');
-            $eventparams = array('objectid' => $page->get('id'),
+            $eventparams = ['objectid' => $page->get('id'),
                 'context' => context_system::instance(),
-                'other' => array(
-                    'actions' => $action
-                ));
+                'other' => [
+                    'actions' => $action,
+                ], ];
             $event = page_updated::create($eventparams);
             $event->trigger();
         }

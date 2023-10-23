@@ -13,21 +13,21 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-
 /**
- * Local plugin mcms - Upgrade plugin tasks
+ * Moodle Mini CMS utility.
+ *
+ * Provide the ability to manage site pages through blocks.
  *
  * @package   local_mcms
  * @copyright 2020 - CALL Learning - Laurent David <laurent@call-learning.fr>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-defined('MOODLE_INTERNAL') || die();
 
 /**
  * Upgrade steps for this plugin
  *
  * @param int $oldversion the version we are upgrading from
- * @return void
+ * @return bool
  * @throws ddl_exception
  * @throws ddl_table_missing_exception
  * @throws downgrade_exception

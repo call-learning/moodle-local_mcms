@@ -28,8 +28,6 @@ namespace local_mcms\event;
 
 use core\event\base;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Class page_deleted
  *
@@ -73,6 +71,6 @@ class page_deleted extends base {
      * @return array
      */
     public static function get_objectid_mapping() {
-        return array('db' => 'local_mcms_page', 'restore' => 'local_mcms_page');
+        return ['db' => 'local_mcms_page', 'restore' => 'local_mcms_page'];
     }
 }

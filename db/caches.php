@@ -27,5 +27,5 @@ defined('MOODLE_INTERNAL') || die();
 $definitions = [
     'menu' => [
         'mode' => cache_store::MODE_SESSION,
-    ]
+    ],
 ];

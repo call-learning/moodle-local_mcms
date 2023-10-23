@@ -21,9 +21,11 @@
  * @copyright 2020 - CALL Learning - Laurent David <laurent@call-learning.fr>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-use local_mcms\page;
-use local_mcms\page_utils;
+namespace local_mcms;
+use advanced_testcase;
+use context_system;
+use context_user;
+use local_mcms_test_base;
 
 defined('MOODLE_INTERNAL') || die();
 require_once('lib.php');
@@ -36,6 +38,13 @@ require_once('lib.php');
 class local_mcms_basic_test extends advanced_testcase {
     use local_mcms_test_base;
 
+    /**
+     * Test page creation and retrieval
+     *
+     * @return void
+     *
+     * @covers \page::create_page
+     */
     public function test_page_create_retrieve() {
         global $DB;
         $this->resetAfterTest();
@@ -45,10 +54,10 @@ class local_mcms_basic_test extends advanced_testcase {
         $usercontext = context_user::instance($user->id);
         $rolesid = $DB->get_fieldset_select('role', 'id', 'shortname IN(\'guest\',\'manager\') ');
         $this->create_page($usercontext, (object) self::SAMPLE_PAGE, $rolesid,
-            array('pexels-simon-migaj-747964.jpg' => 'illustration.jpg'), array('pexels-simon-migaj-747964.jpg' => 'image1.jpg'));
+            ['pexels-simon-migaj-747964.jpg' => 'illustration.jpg'], ['pexels-simon-migaj-747964.jpg' => 'image1.jpg']);
 
         $this->assertEquals(1, page::count_records());
-        $page = page::get_record(array('idnumber' => self::SAMPLE_PAGE['idnumber']));
+        $page = page::get_record(['idnumber' => self::SAMPLE_PAGE['idnumber']]);
         $pagedata = $page->to_record();
         unset($pagedata->timemodified);
         unset($pagedata->timecreated);
@@ -57,6 +66,12 @@ class local_mcms_basic_test extends advanced_testcase {
         $this->assertEquals(self::SAMPLE_PAGE, (array) $pagedata);
     }
 
+    /**
+     * Test page access
+     * @return void
+     *
+     * @covers \page::can_view_page
+     */
     public function test_page_access_page() {
         global $DB;
         $this->resetAfterTest();
@@ -66,7 +81,7 @@ class local_mcms_basic_test extends advanced_testcase {
         $usercontext = context_user::instance($pagecreatoruser->id);
         $rolesid = $DB->get_fieldset_select('role', 'id', 'shortname IN(\'guest\',\'manager\') ');
         $this->create_page($usercontext, (object) self::SAMPLE_PAGE, $rolesid,
-            array('pexels-simon-migaj-747964.jpg' => 'illustration.jpg'), array('pexels-simon-migaj-747964.jpg' => 'image1.jpg'));
+            ['pexels-simon-migaj-747964.jpg' => 'illustration.jpg'], ['pexels-simon-migaj-747964.jpg' => 'image1.jpg']);
 
         $rolessnid = $DB->get_records_menu('role', null, $sort = '', $fields = 'shortname,id');
 
@@ -78,7 +93,7 @@ class local_mcms_basic_test extends advanced_testcase {
 
         $guestuser = guest_user();
 
-        $page = page::get_record(array('idnumber' => self::SAMPLE_PAGE['idnumber']));
+        $page = page::get_record(['idnumber' => self::SAMPLE_PAGE['idnumber']]);
 
         $this->assertTrue(page::can_view_page($manageruser, $page, $systemcontext));
         $this->assertFalse(page::can_view_page($studentuser, $page, $systemcontext));

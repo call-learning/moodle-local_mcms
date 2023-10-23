@@ -42,9 +42,9 @@ Options:
 list($options, $unrecognised) = cli_get_params([
     'help' => false,
     'pageid' => null,
-    'destination' => '/tmp/'
+    'destination' => '/tmp/',
 ], [
-    'h' => 'help'
+    'h' => 'help',
 ]);
 
 if ($unrecognised) {

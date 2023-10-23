@@ -35,7 +35,7 @@ if ($hassiteconfig) {
     $pagedesc = get_string('mcmsgeneralsettings', 'local_mcms');
     $generalsettingspage = new admin_settingpage('mcmsgeneral',
         $pagedesc,
-        array('local/mcms:managepages'),
+        ['local/mcms:managepages'],
         empty($CFG->enablemcms));
 
     $generalsettingspage->add(
@@ -53,7 +53,7 @@ if ($hassiteconfig) {
             'managepage',
             $pagedesc,
             $pageurl,
-            array('local/mcms:managepages'),
+            ['local/mcms:managepages'],
             empty($CFG->enablemcms)
         )
     );

@@ -26,8 +26,6 @@
 
 namespace local_mcms\privacy;
 
-defined('MOODLE_INTERNAL') || die();
-
 
 /**
  * Privacy Subsystem for local_mcms implementing null_provider.

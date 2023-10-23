@@ -23,13 +23,10 @@
  * @copyright 2020 - CALL Learning - Laurent David <laurent@call-learning.fr>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 namespace local_mcms\output\menu;
-
 use local_mcms\menu\menu;
 use plugin_renderer_base;
 
-defined('MOODLE_INTERNAL') || die();
 
 /**
  * Class renderer for menu
@@ -98,7 +95,7 @@ class renderer extends plugin_renderer_base {
         $templatecontext = (object)[
             'nodearray' => [],
             'istablist' => false,
-            'navbarstyle' => 'navbar-nav'
+            'navbarstyle' => 'navbar-nav',
         ];
         foreach ($menu->get_children() as $item) {
             $context = $item->export_for_template($this);

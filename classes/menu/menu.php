@@ -23,15 +23,11 @@
  * @copyright 2020 - CALL Learning - Laurent David <laurent@call-learning.fr>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 namespace local_mcms\menu;
-
 use context_system;
 use local_mcms\page;
 use moodle_exception;
 use moodle_url;
-
-defined('MOODLE_INTERNAL') || die();
 
 /**
  * Mini CMS menu
@@ -67,15 +63,14 @@ class menu extends menu_item {
         if (!empty($definition)) {
             $this->override_children(self::convert_text_to_menu_nodes($definition, $currentlanguage));
         }
+        $this->add_pages_as_children();
+        $this->add_custom_menu();
         $showadmin = $this->mcms_menu_show_site_administration();
         if ($showadmin) {
             $this->add(get_string('administrationsite'), 'administrationsite',
                 new \moodle_url('/admin/search.php'), 1000);
             $this->sort();
         }
-        $this->add_pages_as_children();
-        $this->add_custom_menu();
-
     }
 
     /**
@@ -83,7 +78,6 @@ class menu extends menu_item {
      */
     public function mcms_menu_show_site_administration() {
         global $PAGE;
-        $nodes = [];
         foreach ($PAGE->primarynav->children as $node) {
             if ($node->key == 'siteadminnode') {
                 return true;
@@ -96,7 +90,7 @@ class menu extends menu_item {
      */
     private function add_custom_menu() {
         global $CFG;
-
+        $custommenuitems = "";
         if (empty($custommenuitems) && !empty($CFG->custommenuitems)) {
             $custommenuitems = $CFG->custommenuitems;
         }
@@ -113,7 +107,7 @@ class menu extends menu_item {
      * @param array $children
      */
     public function override_children(array $children) {
-        $this->children = array();
+        $this->children = [];
         foreach ($children as $child) {
             if ($child instanceof menu_item) {
                 $this->children[] = $child;
@@ -159,7 +153,7 @@ class menu extends menu_item {
         $root = new menu_item('root');
         $lastitem = $root;
         $lastdepth = 0;
-        $hiddenitems = array();
+        $hiddenitems = [];
         $lines = explode("\n", $text);
         foreach ($lines as $linenumber => $line) {
             $line = trim($line);
@@ -262,7 +256,7 @@ class menu extends menu_item {
         if (empty($parentmenu) || $parentmenu == self::PAGE_MENU_NONE) {
             $parentpageid = $p->get('parent');
             if (!empty($parentpageid) && ((int) $parentpageid) > 0) {
-                $parentpage = page::get_record(array('id' => $parentpageid));
+                $parentpage = page::get_record(['id' => $parentpageid]);
                 $parentmenu = $parentpage->get('idnumber');
             }
         }
@@ -295,13 +289,10 @@ class menu extends menu_item {
      * @return int
      */
     public static function sort_custom_menu_items(menu_item $itema, menu_item $itemb) {
-        $itema = $itema->get_sort_order();
-        $itemb = $itemb->get_sort_order();
-        if ($itema == $itemb) {
-            return 0;
-        }
+        $sorta = $itema->get_sort_order();
+        $sortb = $itemb->get_sort_order();
 
-        return ($itema > $itemb) ? +1 : -1;
+        return $sorta <=> $sortb;
     }
 
     /**

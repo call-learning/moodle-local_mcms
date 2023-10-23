@@ -23,13 +23,9 @@
  * @copyright 2020 - CALL Learning - Laurent David <laurent@call-learning.fr>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 namespace local_mcms\output\pageheader;
-
 use moodle_exception;
 use plugin_renderer_base;
-
-defined('MOODLE_INTERNAL') || die();
 
 /**
  * Class renderer

@@ -15,7 +15,16 @@
     along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 }}
 {{!
-    Default page header.
+    @template local_mcms/mcmspage_style_default
+
+    Default style for page header
+
+    Example context (json):
+    {
+        "title": "Page title",
+        "descriptionhtml": "<p>Page description</p>",
+        "imagesurl": ["https://moodle.org/logo/moodle-logo.svg"]
+    }
 }}
 <div class="mcms-header-container w-100 text-white text-center page-style-default" {{#imagesurl}} style="background-image: url('{{.}}')" {{/imagesurl}}>
     <h3 class="p-4 text-center">{{title}}</h3>

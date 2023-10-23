@@ -25,9 +25,6 @@
  */
 
 namespace local_mcms;
-
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Class page
  *
@@ -74,7 +71,7 @@ class page extends \core\persistent {
      */
     public static function get_record_by_idnumber($idnumber) {
         global $DB;
-        $record = $DB->get_record(self::TABLE, array('idnumber' => $idnumber));
+        $record = $DB->get_record(self::TABLE, ['idnumber' => $idnumber]);
         if (empty($record)) {
             throw new \moodle_exception('pageoridnumbermssing', 'local_mcms');
         }
@@ -88,48 +85,48 @@ class page extends \core\persistent {
      * @return array|array[]
      */
     protected static function define_properties() {
-        return array(
-                'title' => array(
+        return [
+                'title' => [
                         'type' => PARAM_TEXT,
-                        'default' => ''
-                ),
-                'shortname' => array(
+                        'default' => '',
+                ],
+                'shortname' => [
                         'type' => PARAM_TEXT,
-                        'default' => ''
-                ),
-                'idnumber' => array(
+                        'default' => '',
+                ],
+                'idnumber' => [
                         'type' => PARAM_ALPHANUMEXT,
-                        'default' => ''
-                ),
-                'description' => array(
+                        'default' => '',
+                ],
+                'description' => [
                         'type' => PARAM_CLEANHTML,
-                        'default' => ''
-                ),
-                'descriptionformat' => array(
+                        'default' => '',
+                ],
+                'descriptionformat' => [
                         'type' => PARAM_INT,
-                        'default' => 1
-                ),
-                'parent' => array(
+                        'default' => 1,
+                ],
+                'parent' => [
                         'type' => PARAM_INT,
-                        'default' => 0
-                ),
-                'style' => array(
+                        'default' => 0,
+                ],
+                'style' => [
                         'type' => PARAM_ALPHANUMEXT,
-                        'default' => ''
-                ),
-                'ctalink' => array(
+                        'default' => '',
+                ],
+                'ctalink' => [
                         'type' => PARAM_URL,
-                        'default' => ''
-                ),
-                'parentmenu' => array(
+                        'default' => '',
+                ],
+                'parentmenu' => [
                         'type' => PARAM_ALPHANUMEXT,
-                        'default' => ''
-                ),
-                'menusortorder' => array(
+                        'default' => '',
+                ],
+                'menusortorder' => [
                         'type' => PARAM_INT,
-                        'default' => 0
-                ),
-        );
+                        'default' => 0,
+                ],
+        ];
     }
 
     /**
