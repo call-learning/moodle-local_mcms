@@ -118,7 +118,10 @@ class page_list extends table_sql {
 
         // If we reach that point new users logs have been generated since the last users db query.
         list($usql, $uparams) = $DB->get_in_or_equal($userid);
-        $sql = "SELECT id," . get_all_user_name_fields(true) . " FROM {user} WHERE id " . $usql;
+        $sql = "SELECT id,"
+            . implode(',', \core_user\fields::get_name_fields(true))
+            . " FROM {user} WHERE id "
+            . $usql;
         if (!$user = $DB->get_record_sql($sql, $uparams)) {
             $this->userfullnames[$userid] = false;
             return false;
