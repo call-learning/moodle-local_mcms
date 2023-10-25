@@ -24,13 +24,14 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_mcms;
-
+namespace local_mcms;;
+defined('MOODLE_INTERNAL') || die;
+global $CFG;
+require_once($CFG->libdir . '/tablelib.php');
 use moodle_url;
 use pix_icon;
 use popup_action;
 use stdClass;
-use table_sql;
 
 /**
  * Page list
@@ -39,7 +40,7 @@ use table_sql;
  * @copyright 2020 - CALL Learning - Laurent David <laurent@call-learning.fr>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class page_list extends table_sql {
+class page_list extends \table_sql {
 
     /** @var array list of user fullname shown in report */
     private $userfullnames = [];
