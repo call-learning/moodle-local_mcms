@@ -112,6 +112,7 @@ $string['pagestyle:cta'] = 'CALL To Action Style';
 $string['pluginname'] = 'Moodle Mini CMS';
 
 $string['rootmenuitems'] = 'Root menu items';
+$string['adminnav'] = 'Admin navigation';
 
 $string['rootmenuitems_help'] =
     'A set of items that will be displayed as root menus in the page. Enter each menu item on a new line' .
