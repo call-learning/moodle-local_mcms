@@ -105,9 +105,26 @@ class menu extends menu_item {
         // Add the secondary navigation items on these page layouts
         $pagelayouts = ['mycourses', 'my-index', 'frontpage', 'admin'];
         $secondarynavitems = ['questionbank', 'contentbank'];
+
+        $configureditems = get_config('local_mcms', 'adminmenuitems');
+        if ($configureditems) {
+            $items = explode(',', $configureditems);
+            $configureditems = [];
+            foreach ($items as $item) {
+                $item = trim($item);
+                if (empty($item)) {
+                    continue;
+                }
+                $configureditems[] = $item;
+            }
+        }
+        if (empty($configureditems)) {
+            $configureditems = $secondarynavitems;
+        }
+        // get the secondary navigation items from the config
         if (in_array($PAGE->pagelayout, $pagelayouts) && $PAGE->secondarynav) {
             foreach ($PAGE->secondarynav->children as $node) {
-                if (!in_array($node->key, $secondarynavitems)) {
+                if (!in_array($node->key, $configureditems)) {
                     continue;
                 }
                 $admin->add($node->text, '', $node->action, 500);
