@@ -44,6 +44,10 @@ $generalsettingspage->add(
     new admin_setting_configtextarea('local_mcms/rootmenuitems', new lang_string('rootmenuitems', 'local_mcms'),
         new lang_string('rootmenuitems_help', 'local_mcms'), '', PARAM_RAW, '50', '10')
 );
+$generalsettingspage->add(
+    new admin_setting_configtextarea('local_mcms/adminmenuitems', new lang_string('adminmenuitems', 'local_mcms'),
+        new lang_string('adminmenuitems_help', 'local_mcms'), '', PARAM_RAW, '50', '5')
+);
 $mcmsmanagement->add('mcmspagemanagement', $generalsettingspage);
 
 // Page Management.

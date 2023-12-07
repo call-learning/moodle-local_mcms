@@ -112,6 +112,7 @@ $string['pagestyle:cta'] = 'CALL To Action Style';
 $string['pluginname'] = 'Moodle Mini CMS';
 
 $string['rootmenuitems'] = 'Root menu items';
+$string['adminnav'] = 'Admin navigation';
 
 $string['rootmenuitems_help'] =
     'A set of items that will be displayed as root menus in the page. Enter each menu item on a new line' .
@@ -129,3 +130,7 @@ Courses
 -Les cours des inscrits|lescoursdesinscrits|https://someurl.xyz/pmf||es|student,teacher
 Mobile app|mobileapp|https://someurl.xyz/app
 </pre>';
+
+$string['adminmenuitems'] = 'Admin menu items';
+$string['adminmenuitems_help'] = 'A comma separated list of admin menu items. For example:' .
+    'questionbank, contentbank, users, coursereports';

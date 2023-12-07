@@ -63,28 +63,11 @@ class menu extends menu_item {
         if (!empty($definition)) {
             $this->override_children(self::convert_text_to_menu_nodes($definition, $currentlanguage));
         }
+        $this->admin_toolsmenu();
         $this->add_pages_as_children();
         $this->add_custom_menu();
-        $showadmin = $this->mcms_menu_show_site_administration();
-        if ($showadmin) {
-            $this->add(get_string('administrationsite'), 'administrationsite',
-                new \moodle_url('/admin/search.php'), 1000);
-            $this->sort();
-        }
     }
 
-    /**
-     * Check if we should add the site administration node to the menu
-     */
-    public function mcms_menu_show_site_administration() {
-        global $PAGE;
-        foreach ($PAGE->primarynav->children as $node) {
-            if ($node->key == 'siteadminnode') {
-                return true;
-            }
-        }
-        return false;
-    }
     /**
      * Add moodle's custom menu items.
      */
@@ -98,6 +81,54 @@ class menu extends menu_item {
         $custommenuitems = $custommenu->get_children();
         foreach ($custommenuitems as $item) {
             $this->add($item->get_text(), '', $item->get_url(), 500);
+        }
+    }
+
+    /**
+     * Add the admin tools menu items.
+     */
+    public function admin_toolsmenu() {
+        global $PAGE;
+        // Check if the user is logged in.
+        if (!has_capability('local/mcms:managepages', context_system::instance())) {
+            return;
+        };
+        $template = new \stdClass();
+        $template->menuitems = [];
+        $admin = $this->add(get_string('adminnav', 'local_mcms'), '', new moodle_url('/admin'), 500);
+
+        if ($PAGE->primarynav) {
+            foreach ($PAGE->primarynav->children as $node) {
+                $admin->add($node->text, '', $node->action, 500);
+            }
+        }
+        // Add the secondary navigation items on these page layouts
+        $pagelayouts = ['mycourses', 'my-index', 'frontpage', 'admin'];
+        $secondarynavitems = ['questionbank', 'contentbank'];
+
+        $configureditems = get_config('local_mcms', 'adminmenuitems');
+        if ($configureditems) {
+            $items = explode(',', $configureditems);
+            $configureditems = [];
+            foreach ($items as $item) {
+                $item = trim($item);
+                if (empty($item)) {
+                    continue;
+                }
+                $configureditems[] = $item;
+            }
+        }
+        if (empty($configureditems)) {
+            $configureditems = $secondarynavitems;
+        }
+        // get the secondary navigation items from the config
+        if (in_array($PAGE->pagelayout, $pagelayouts) && $PAGE->secondarynav) {
+            foreach ($PAGE->secondarynav->children as $node) {
+                if (!in_array($node->key, $configureditems)) {
+                    continue;
+                }
+                $admin->add($node->text, '', $node->action, 500);
+            }
         }
     }
 
