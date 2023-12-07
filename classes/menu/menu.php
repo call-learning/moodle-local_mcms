@@ -63,9 +63,10 @@ class menu extends menu_item {
         if (!empty($definition)) {
             $this->override_children(self::convert_text_to_menu_nodes($definition, $currentlanguage));
         }
-        $this->admin_toolsmenu();
         $this->add_pages_as_children();
         $this->add_custom_menu();
+        $this->admin_toolsmenu();
+        $this->sort();
     }
 
     /**
@@ -95,14 +96,14 @@ class menu extends menu_item {
         };
         $template = new \stdClass();
         $template->menuitems = [];
-        $admin = $this->add(get_string('adminnav', 'local_mcms'), '', new moodle_url('/admin'), 500);
+        $admin = $this->add(get_string('adminnav', 'local_mcms'), 'administrationsite', new moodle_url('/admin'), 500);
 
         if ($PAGE->primarynav) {
             foreach ($PAGE->primarynav->children as $node) {
                 $admin->add($node->text, '', $node->action, 500);
             }
         }
-        // Add the secondary navigation items on these page layouts
+        // Add the secondary navigation items on these page layouts.
         $pagelayouts = ['mycourses', 'my-index', 'frontpage', 'admin'];
         $secondarynavitems = ['questionbank', 'contentbank'];
 
@@ -121,13 +122,13 @@ class menu extends menu_item {
         if (empty($configureditems)) {
             $configureditems = $secondarynavitems;
         }
-        // get the secondary navigation items from the config
+        // Get the secondary navigation items from the config.
         if (in_array($PAGE->pagelayout, $pagelayouts) && $PAGE->secondarynav) {
             foreach ($PAGE->secondarynav->children as $node) {
                 if (!in_array($node->key, $configureditems)) {
                     continue;
                 }
-                $admin->add($node->text, '', $node->action, 500);
+                $admin->add($node->text, '', $node->action ?: null, 500);
             }
         }
     }
